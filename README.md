@@ -1,1 +1,1 @@
-# stock-market
+# Stock Market
