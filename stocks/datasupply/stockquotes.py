@@ -15,7 +15,7 @@ class StockQuotes():
     def data(self):
         if self._data is None:
             self._data = self._get_data()
-        return self._data
+        return self._data  # TODO: consider using .copy() here
 
     @property
     def csv_file_path(self):
