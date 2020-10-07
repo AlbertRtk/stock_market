@@ -22,5 +22,8 @@ def rsi(prices, alpha=1/14):
 
     output_rsi = -100 / (rs+1)
     output_rsi = output_rsi + 100
+    
+    output_rsi = output_rsi.rename('RSI')
+    output_rsi = output_rsi.to_frame()
 
     return output_rsi
