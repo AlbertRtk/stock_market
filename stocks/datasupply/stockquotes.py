@@ -1,5 +1,6 @@
 from . import DATA_DIR
 import pandas as pd
+import numpy as np
 from os import path
 from urllib.request import urlretrieve
 from datetime import datetime, timedelta
@@ -31,6 +32,7 @@ class StockQuotes():
                              index_col='Date',
                              parse_dates=['Date'],
                              date_parser=lambda x: datetime.strptime(x, '%Y-%m-%d'))
+        output['Volume'] = output['Volume'].astype(np.float64)
         return output
 
     def _get_data(self):
