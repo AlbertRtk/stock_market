@@ -1,3 +1,7 @@
+[See on GitHub!](https://github.com/AlbertRtk/stock_market)
+
+---
+
 The project focuses on the analysis of the stock market and the automation of the decision process for financial investing.
 
 ## Disclaimer
