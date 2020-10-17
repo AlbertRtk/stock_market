@@ -1,1 +1,2 @@
+# Python 3.8.8 :: Anaconda
 mplfinance-0.12.7a0
