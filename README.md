@@ -1,6 +1,4 @@
-# Stock Market
-
-The project focusing on the analysis of the stock market and the automation of the decision process for financial investing.
+The project focuses on the analysis of the stock market and the automation of the decision process for financial investing.
 
 ## Disclaimer
 
