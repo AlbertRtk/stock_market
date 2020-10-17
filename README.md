@@ -12,7 +12,7 @@ This is an educational project created by a hobbyist, programming, and data scie
 
 ```class stocks.stock.Stock(ticker=None)```
 
-Contains information about the stock with the given ticker. Utilized ```stocks.sqtscraper``` to scrap data from [stooq.com](stooq.com).
+Contains information about the stock with the given ticker. Utilized ```stocks.sqtscraper``` to scrap data from [stooq.com](https://www.stooq.com).
 
 * ### stocks.stock.Stock.ohlc
     Returns pandas.DataFrame with OHLC prices.
@@ -48,7 +48,7 @@ Contains information about the stock with the given ticker. Utilized ```stocks.s
     Returns dividend yield
 
 * ### stocks.stock.Stock.stooq_plot_link
-    Returns the link to the OHLC candlestick plot on [stooq.com](stooq.com).
+    Returns the link to the OHLC candlestick plot on [stooq.com](https://www.stooq.com).
 
 <br />
 
