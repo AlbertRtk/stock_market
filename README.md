@@ -1,4 +1,6 @@
-[See on GitHub!](https://github.com/AlbertRtk/stock_market_insights)
+[See on GitHub!](https://github.com/AlbertRtk/stock_market_insights) 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+[Other projets](https://albertrtk.github.io/)
 
 ---
 
