@@ -85,7 +85,7 @@ class Stock:
         return link
 
     def mean_volume(self, over_last):
-        volume = self.ohlc.head(over_last)['Volume']
+        volume = self.ohlc.tail(over_last)['Volume']
         output = volume.mean()
         return output
 
