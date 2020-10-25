@@ -51,6 +51,7 @@ class StockQuotes():
 
     def _get_data(self):
         update_required = True  # assuming that update will be required
+        output = pd.DataFrame()
 
         """ time info """
         time_now = datetime.now()
@@ -78,9 +79,9 @@ class StockQuotes():
 
         if update_required:
             """ update CSV file and read data """
-            new_output = self.download_ohlc_csv_from_stooq()
+            new_output = self.download_ohlc_from_stooq()
 
-            if ouput:
+            if new_output:
                 """ Updated data downloaded - save to CSV and update output """
                 new_output.to_csv(self.csv_file_path)
                 output = new_output
@@ -88,7 +89,7 @@ class StockQuotes():
                 """ Update error (Stooq: Exceeded the daily hits limit) """
                 pass
     
-        if output:
+        if not output.empty:
             output.sort_index(ascending=True, inplace=True)
         
         return output
