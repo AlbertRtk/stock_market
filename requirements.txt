@@ -1,2 +1,3 @@
-# Python 3.8.8 :: Anaconda
+pandas
+numpy
 mplfinance-0.12.7a0

@@ -57,7 +57,7 @@ class StockQuotes():
             """ CSV updated within last 24 hours or it is weekend (no new data) """
             if (timestamp_now - timestamp_up < 24 * 3600) or is_weekend:
                 output = self.read_csv_file()
-                last_ohlc_time = output.iloc[0].name
+                last_ohlc_time = output.iloc[-1].name
 
                 if last_ohlc_time.date() == expected_ohlc_time.date() or (time_now.hour < 20 and not is_weekend):
                     update_required = False
