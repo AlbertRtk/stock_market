@@ -6,6 +6,21 @@ from urllib.request import urlretrieve
 from datetime import datetime, timedelta
 
 
+def read_ohlcv_from_csv(file_path):
+    """
+    Reads OHLCV data from CSV file.
+
+    :param file_path: path to CSV file with OHLCV data
+    :return: Pandas DataFrame with OHLCV data
+    """
+    output = pd.read_csv(file_path, 
+                         index_col='Date',
+                         parse_dates=['Date'],
+                         date_parser=lambda x: datetime.strptime(x, '%Y-%m-%d'))
+    output['Volume'] = output['Volume'].astype(np.float64)
+    return output
+
+
 class StockQuotes():
     def __init__(self, ticker):
         super().__init__()
@@ -16,24 +31,23 @@ class StockQuotes():
     def data(self):
         if self._data is None:
             self._data = self._get_data()
-        return self._data  # TODO: consider using .copy() here
+        return self._data 
 
     @property
     def csv_file_path(self):
         return path.join(DATA_DIR, f'{self.ticker}_ohcl.csv')
 
-    def download_ohlc_csv_from_stooq(self):
+    def download_ohlc_from_stooq(self):
         url = f'http://stooq.com/q/d/l/?i=d&s={self.ticker}'
-        file_path, _ = urlretrieve(url, self.csv_file_path)
-        return file_path
+        file_path, _ = urlretrieve(url)
+        try:
+            output = read_ohlcv_from_csv(file_path)
+        except ValueError:  # Stooq: Exceeded the daily hits limit
+            output = None
+        return output
 
     def read_csv_file(self):
-        output = pd.read_csv(self.csv_file_path, 
-                             index_col='Date',
-                             parse_dates=['Date'],
-                             date_parser=lambda x: datetime.strptime(x, '%Y-%m-%d'))
-        output['Volume'] = output['Volume'].astype(np.float64)
-        return output
+        return read_ohlcv_from_csv(self.csv_file_path)
 
     def _get_data(self):
         update_required = True  # assuming that update will be required
@@ -64,10 +78,18 @@ class StockQuotes():
 
         if update_required:
             """ update CSV file and read data """
-            self.download_ohlc_csv_from_stooq()
-            output = self.read_csv_file()
+            new_output = self.download_ohlc_csv_from_stooq()
+
+            if ouput:
+                """ Updated data downloaded - save to CSV and update output """
+                new_output.to_csv(self.csv_file_path)
+                output = new_output
+            else:
+                """ Update error (Stooq: Exceeded the daily hits limit) """
+                pass
     
-        output.sort_index(ascending=True, inplace=True)
+        if output:
+            output.sort_index(ascending=True, inplace=True)
         
         return output
 
