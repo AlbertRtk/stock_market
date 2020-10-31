@@ -81,7 +81,7 @@ class StockQuotes():
             """ update CSV file and read data """
             new_output = self.download_ohlc_from_stooq()
 
-            if new_output:
+            if not new_output.empty:
                 """ Updated data downloaded - save to CSV and update output """
                 new_output.to_csv(self.csv_file_path)
                 output = new_output
