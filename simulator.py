@@ -51,7 +51,7 @@ def simulator(time_range, traded_stocks, wallet, take_profit, stop_loss):
                         print(f'{day}: Sell {volume} {tck} for {price}')
 
                 # call decorated function - strategy function
-                stocks_to_buy, stocks_to_sell = func(day=day, *args, **kwargs)
+                stocks_to_buy, stocks_to_sell = func(day=day, traded_stocks=traded_stocks, *args, **kwargs)
             
                 # update prices of stocks in wallet and take profit / stop loss
                 for tck in wallet.list_stocks():
@@ -89,8 +89,9 @@ if None:
         :param arguments: any arguments needed for the strategy can be passed
         """
         day = kwargs['day']  # argument passed by decorator
-        stocks_to_buy = set()
-        stocks_to_sell = set()
+        traded_stocks = kwargs['traded_stocks']  # argument passed by decorator
+        stocks_to_buy = []
+        stocks_to_sell = []
 
         """
         place for code that will fill in stocks_to_buy and stocks_to_sell sets with tickers
