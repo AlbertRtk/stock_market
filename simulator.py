@@ -1,22 +1,7 @@
-from stocks.stock import Stock
-from analysis.rsi import rsi,rsi_cross_signals
-from stocks.stock_index import wig20_2019, mwig40
-from wallet.wallet import Wallet
 import pandas as pd
 
 
-
-"""
-TODO:
-- this is only an ugly working template
-- make a wrapper to simulate a strategy defined in function
-- think where to keep simulation settings/config
-- plot strategy performance 
-"""
-
-
-
-def calculate_investment_value(wallet, max_fraction):
+def __calculate_investment_value(wallet, max_fraction):
     output = 0
     min_value = wallet.minimal_recommended_investment()
     if wallet.money > min_value:
@@ -26,90 +11,93 @@ def calculate_investment_value(wallet, max_fraction):
     return output
 
 
-start_date = '2018-01-01'
-end_date = '2019-12-31'
-time_range = pd.date_range(start_date, end_date)
+def simulator(time_range, traded_stocks, wallet, take_profit, stop_loss):
+    """
+    This function returns decorator for a stock market strategy.
 
-my_wallet = Wallet(commission_rate=0.0038, min_commission=3.0)
-my_wallet.money = 10000
+    :param time_range:
+    :param traded_stocks:
+    :param wallet:
+    :param take_profit:
+    :param stop_loss:
+    :return: 
+    """
 
-take_profit = 0.15
-stop_loss = 0.01
+    def strategy_wrapper(func):
 
-performance = pd.DataFrame(columns=['Date', 'Wallet state'])
+        def simulation(*args, **kwargs):
+            wallet_history = pd.DataFrame(columns=['Date', 'Wallet state'])
+            stocks_to_buy = []
+            stocks_to_sell = []
 
-traded_tickers = wig20_2019
-traded_tickers.update(mwig40)
-stocks_data = dict()
-rsi_tables = dict()
+            for day in time_range:
+                # Buy selected. Loop over list, order can be important here.
+                # Strategy can sort relevant stocks - high priority first.
+                for tck in stocks_to_buy:
+                    if not wallet.get_volume_of_stocks(tck):
+                        price = traded_stocks[tck].ohlc.loc[day, 'Open']
+                        total = __calculate_investment_value(wallet, 5)
+                        volume = round(total/price)
+                        if volume:
+                            wallet.buy(tck, volume, price)
+                            print(f'{day}: Buy {volume} {tck} for {price}')
 
-for tck in traded_tickers:
-    stocks_data[tck] = Stock(tck)
-    rsi_tables[tck] = rsi(stocks_data[tck].ohlc)
-    rsi_tables[tck]['Buy'] = rsi_cross_signals(rsi_tables[tck], 30 , 'onrise')
-    rsi_tables[tck]['Sell'] = rsi_cross_signals(rsi_tables[tck], 70, 'onrise')
+                # Sell selected. List to set, we dont care here about the order.
+                # Set will remove duplcates.
+                for tck in set(stocks_to_sell):
+                    if wallet.get_volume_of_stocks(tck):
+                        price = traded_stocks[tck].ohlc.loc[day, 'Open']
+                        volume = wallet.sell_all(tck, price)
+                        print(f'{day}: Sell {volume} {tck} for {price}')
 
+                # call decorated function - strategy function
+                stocks_to_buy, stocks_to_sell = func(day=day, *args, **kwargs)
+            
+                # update prices of stocks in wallet and take profit / stop loss
+                for tck in wallet.list_stocks():
+                    price = traded_stocks[tck].ohlc.loc[day, 'Close']
+                    wallet.update_price(tck, price)
 
-stocks_to_buy = set()
-stocks_to_sell = set()
+                    """ take profit """
+                    if take_profit and wallet.change(tck) > take_profit:
+                        stocks_to_sell.append(tck)
 
+                    """ stop loss """
+                    if stop_loss and wallet.change(tck) < -stop_loss:
+                        stocks_to_sell.append(tck)
 
-for day in time_range:
+                # save history of the wallet
+                wallet_history = wallet_history.append(
+                    {'Date': day, 'Wallet state': wallet.total_value},
+                    ignore_index=True
+                    )
+            
+            return wallet_history
 
-    for tck in traded_tickers:
-        
-        if day in stocks_data[tck].ohlc.index:
+        return simulation
 
-            # buy selected
-            if tck in stocks_to_buy:
-                if not my_wallet.get_volume_of_stocks(tck):
-                    price = stocks_data[tck].ohlc.loc[day, 'Open']
-                    total = calculate_investment_value(my_wallet, 5)
-                    volume = round(total/price)
-                    if volume:
-                        my_wallet.buy(tck, volume, price)
-                        print(f'{day}: Buy {volume} x {tck} for {price}')
-                stocks_to_buy.remove(tck)
-
-
-            # sell selected
-            if tck in stocks_to_sell:
-                if my_wallet.get_volume_of_stocks(tck):
-                    price = stocks_data[tck].ohlc.loc[day, 'Open']
-                    volume = my_wallet.sell_all(tck, price)
-                    print(f'{day}: Sell {volume} x {tck} for {price}')
-                stocks_to_sell.remove(tck)
-
-        
-            # select stocks to buy the next day
-            if rsi_tables[tck]['Buy'].get(day, None):
-                stocks_to_buy.add(tck)
-    
-            # select stocks to sell the next day
-            if rsi_tables[tck]['Sell'].get(day, None):
-                stocks_to_sell.add(tck)
-                # print(day, tck, 'Sell')
-                # print('==========================================================')
-
-
-    for tck in my_wallet.list_stocks():
-        if day in stocks_data[tck].ohlc.index:
-            # update prices of stocks in wallet 
-            price = stocks_data[tck].ohlc.loc[day, 'Close']
-            my_wallet.update_price(tck, price)
-
-            """ take profit """
-            if take_profit and my_wallet.change(tck) > take_profit:
-                stocks_to_sell.add(tck)
-
-            """ stop loss """
-            if stop_loss and my_wallet.change(tck) < -stop_loss:
-                stocks_to_sell.add(tck)
-
-    performance = performance.append(
-        {'Date': day, 'Wallet state': my_wallet.total_value},
-        ignore_index=True
-        )
+    return strategy_wrapper
 
 
-print(performance)
+if None:
+    """
+    This code should not be called - this is just a template function for tested strategy.
+    """
+    @simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, TAKE_PROFIT, STOP_LOSS)
+    def __strategy_template(arguments, *args, **kwargs):
+        """
+        :param arguments: any arguments needed for the strategy can be passed
+        """
+        day = kwargs['day']  # argument passed by decorator
+        stocks_to_buy = set()
+        stocks_to_sell = set()
+
+        """
+        place for code that will fill in stocks_to_buy and stocks_to_sell sets with tickers
+        """
+
+        return stocks_to_buy, stocks_to_sell
+
+
+if __name__ == '__main__':
+    pass
