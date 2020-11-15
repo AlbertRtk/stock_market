@@ -2,3 +2,5 @@ pandas
 numpy
 mplfinance
 requests
+seaborn
+notebook
