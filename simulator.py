@@ -5,6 +5,17 @@ from wallet.wallet import Wallet
 import pandas as pd
 
 
+
+"""
+TODO:
+- this is only an ugly working template
+- make a wrapper to simulate a strategy defined in function
+- think where to keep simulation settings/config
+- plot strategy performance 
+"""
+
+
+
 def calculate_investment_value(wallet, max_fraction):
     output = 0
     min_value = wallet.minimal_recommended_investment()
@@ -88,11 +99,11 @@ for day in time_range:
             my_wallet.update_price(tck, price)
 
             """ take profit """
-            if my_wallet.change(tck) > take_profit:
+            if take_profit and my_wallet.change(tck) > take_profit:
                 stocks_to_sell.add(tck)
 
             """ stop loss """
-            if my_wallet.change(tck) < -stop_loss:
+            if stop_loss and my_wallet.change(tck) < -stop_loss:
                 stocks_to_sell.add(tck)
 
     performance = performance.append(
