@@ -1,7 +1,7 @@
 
 
 # WIG20
-wig20 = {
+wig20_2019 = {
     'ALR': 'ALIOR',
     'CCC': 'CCC',
     'CDR': 'CDPROJEKT',
@@ -12,6 +12,29 @@ wig20 = {
     'LPP': 'LPP',
     'LTS': 'LOTOS',
     'MBK': 'MBANK',
+    'OPL': 'ORANGEPL',
+    'PEO': 'PEKAO',
+    'PGE': 'PGE',
+    'PGN': 'PGNIG',
+    'PKN': 'PKNORLEN',
+    'PKO': 'PKOBP',
+    'PLY': 'PLAY',
+    'PZU': 'PZU',
+    'SPL': 'SANPL',
+    'TPE': 'TAURONPE',
+}
+
+wig20 = {
+    'ALE': 'ALLEGRO',
+    'ALR': 'ALIOR',
+    'CCC': 'CCC',
+    'CDR': 'CDPROJEKT',
+    'CPS': 'CYFRPLSAT',
+    'DNP': 'DINOPL',
+    'JSW': 'JSW',
+    'KGH': 'KGHM',
+    'LPP': 'LPP',
+    'LTS': 'LOTOS',
     'OPL': 'ORANGEPL',
     'PEO': 'PEKAO',
     'PGE': 'PGE',
