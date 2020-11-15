@@ -142,6 +142,7 @@ class Wallet(Commission):
     def sell_all(self, name: str, price: float) -> None:
         volume = self.get_volume_of_stocks(name)
         self.sell(name, volume, price)
+        return volume
 
     def list_stocks(self) -> list:
         return self.stocks.loc[:, 'Name'].to_list()
