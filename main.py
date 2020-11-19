@@ -15,6 +15,7 @@ MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
 MY_WALLET.money = 10000
 TAKE_PROFIT = 0.15
 STOP_LOSS = 0.03
+ACTIVE_TRAIDING = False
 TRADED_TICKERS = wig20_2019
 TRADED_TICKERS.update(mwig40)
 # ==============================================================================
@@ -32,7 +33,7 @@ print()
 
 
 # === STRATEGY DEFINITION ======================================================
-@simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, TAKE_PROFIT, STOP_LOSS)
+@simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
 def strategy(rsi_tables, *args, **kwargs):
     day = kwargs['day']
     traded_stocks = kwargs['traded_stocks']

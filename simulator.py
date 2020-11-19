@@ -1,4 +1,5 @@
 import pandas as pd
+from extra_print import print_green, print_red
 
 
 def __calculate_investment_value(wallet, max_fraction):
@@ -11,16 +12,19 @@ def __calculate_investment_value(wallet, max_fraction):
     return output
 
 
-def simulator(time_range, traded_stocks, wallet, take_profit, stop_loss):
+def simulator(time_range, traded_stocks, wallet, take_profit=0, stop_loss=0, auto_traiding=False):
     """
     This function returns decorator for a stock market strategy.
 
-    :param time_range:
-    :param traded_stocks:
-    :param wallet:
-    :param take_profit:
-    :param stop_loss:
-    :return: 
+    :param time_range: an array with traiding days only (no Saturdays, Sundays, holidays)
+    :param traded_stocks: a dictionary with stocks.stock.Stock instances
+    :param wallet: wallet.wallet.Wallet for traiding 
+    :param take_profit: if the price of a stock increases by this fraction, it will be sold;
+        if equal 0 - take profit is deactivated (default)
+    :param stop_loss: if the price of a stock decreases by this fraction, it will be sold;
+        if equal 0 - stop loss is deactivated (default)
+    :return: decorator for a stock market strategy that returns change of wallet value 
+        over given time_range
     """
 
     def strategy_wrapper(func):
@@ -31,7 +35,9 @@ def simulator(time_range, traded_stocks, wallet, take_profit, stop_loss):
             stocks_to_sell = []
 
             for day in time_range:
-                # Buy selected. Loop over list, order can be important here.
+                day_str = day.strftime('%Y-%m-%d')
+
+                # Buy selected day before. Loop over list, order can be important here.
                 # Strategy can sort relevant stocks - high priority first.
                 for tck in stocks_to_buy:
                     if not wallet.get_volume_of_stocks(tck):
@@ -40,31 +46,56 @@ def simulator(time_range, traded_stocks, wallet, take_profit, stop_loss):
                         volume = round(total/price)
                         if volume:
                             wallet.buy(tck, volume, price)
-                            print(f'{day}: Buy {volume} {tck} for {price}')
+                            print(f'{day_str}: Buy {volume} {tck} for {price}')
 
-                # Sell selected. List to set, we dont care here about the order.
+                # Sell selected day before. List to set, we dont care here about the order.
                 # Set will remove duplcates.
                 for tck in set(stocks_to_sell):
                     if wallet.get_volume_of_stocks(tck):
                         price = traded_stocks[tck].ohlc.loc[day, 'Open']
                         volume = wallet.sell_all(tck, price)
-                        print(f'{day}: Sell {volume} {tck} for {price}')
+                        print(f'{day_str}: Sell {volume} {tck} for {price}')
 
                 # call decorated function - strategy function
                 stocks_to_buy, stocks_to_sell = func(day=day, traded_stocks=traded_stocks, *args, **kwargs)
-            
-                # update prices of stocks in wallet and take profit / stop loss
-                for tck in wallet.list_stocks():
+
+                # if auto traiding is active, check if price of any stock in the wallet crossed
+                # take proffit or stop loss price; if yes then sell it immediately 
+                if auto_traiding:
+                    for tck in wallet.list_stocks().copy():
+
+                        price_max = traded_stocks[tck].ohlc.loc[day, 'High']
+                        wallet.update_price(tck, price_max)
+                        if wallet.change(tck) > take_profit:
+                            price = wallet.get_purchase_price_of_stocks(tck) * (1+take_profit)  # selling it immediately
+                            price = round(price, 2)
+                            volume = wallet.sell_all(tck, price)
+                            print_green(f'{day_str}: Take profit {volume} {tck} for {price}')
+                            continue
+
+                        price_min = traded_stocks[tck].ohlc.loc[day, 'Low']
+                        wallet.update_price(tck, price_min)
+                        if wallet.change(tck) < -stop_loss:
+                            price = wallet.get_purchase_price_of_stocks(tck) * (1-stop_loss)  # selling it immediately
+                            price = round(price, 2)
+                            volume = wallet.sell_all(tck, price)
+                            print_red(f'{day_str}: Stop loss {volume} {tck} for {price}')
+                            
+                for tck in wallet.list_stocks():                        
+                    # update the price to the closing price
                     price = traded_stocks[tck].ohlc.loc[day, 'Close']
                     wallet.update_price(tck, price)
 
-                    """ take profit """
-                    if take_profit and wallet.change(tck) > take_profit:
-                        stocks_to_sell.append(tck)
+                    # if auto traiding is not active, then take profit / stop loss the next day
+                    if not auto_traiding:
 
-                    """ stop loss """
-                    if stop_loss and wallet.change(tck) < -stop_loss:
-                        stocks_to_sell.append(tck)
+                        # take profit the next day
+                        if take_profit and wallet.change(tck) > take_profit:
+                            stocks_to_sell.append(tck)
+
+                        # stop loss the next day
+                        if stop_loss and wallet.change(tck) < -stop_loss:
+                            stocks_to_sell.append(tck)
 
                 # save history of the wallet
                 wallet_history = wallet_history.append(
