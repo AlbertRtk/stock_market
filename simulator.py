@@ -12,6 +12,11 @@ def __calculate_investment_value(wallet, max_fraction):
     return output
 
 
+def __determine_print_color_from_prices(price, purchase_price):
+    print_color = print_green if price > purchase_price else print_red
+    return print_color
+
+
 def simulator(time_range, traded_stocks, wallet, take_profit=0, stop_loss=0, auto_traiding=False):
     """
     This function returns decorator for a stock market strategy.
@@ -23,6 +28,8 @@ def simulator(time_range, traded_stocks, wallet, take_profit=0, stop_loss=0, aut
         if equal 0 - take profit is deactivated (default)
     :param stop_loss: if the price of a stock decreases by this fraction, it will be sold;
         if equal 0 - stop loss is deactivated (default)
+    :param auto_traiding: boolean, if True selling immediately when stop loss / take profit 
+        is reached is simulated
     :return: decorator for a stock market strategy that returns change of wallet value 
         over given time_range
     """
@@ -53,8 +60,9 @@ def simulator(time_range, traded_stocks, wallet, take_profit=0, stop_loss=0, aut
                 for tck in set(stocks_to_sell):
                     if wallet.get_volume_of_stocks(tck):
                         price = traded_stocks[tck].ohlc.loc[day, 'Open']
+                        print_color = __determine_print_color_from_prices(price, wallet.get_purchase_price_of_stocks(tck))
                         volume = wallet.sell_all(tck, price)
-                        print(f'{day_str}: Sell {volume} {tck} for {price}')
+                        print_color(f'{day_str}: Sell {volume} {tck} for {price}')
 
                 # call decorated function - strategy function
                 stocks_to_buy, stocks_to_sell = func(day=day, traded_stocks=traded_stocks, *args, **kwargs)

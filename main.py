@@ -5,6 +5,9 @@ from wallet.wallet import Wallet
 from simulator import simulator
 from scipy import stats
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 
 # === CONFIG ===================================================================
@@ -27,14 +30,15 @@ rsi_tables = dict()
 for tck in tqdm(TRADED_TICKERS):
     stocks_data[tck] = Stock(tck)
     rsi_tables[tck] = rsi(stocks_data[tck].ohlc)
-    rsi_tables[tck]['Buy'] = rsi_cross_signals(rsi_tables[tck], 40 , 'onrise')
-    rsi_tables[tck]['Sell'] = rsi_cross_signals(rsi_tables[tck], 60, 'onrise')
+    rsi_tables[tck]['Buy'] = rsi_cross_signals(rsi_tables[tck], 30 , 'onrise')
+    rsi_tables[tck]['Sell'] = rsi_cross_signals(rsi_tables[tck], 70, 'onrise')
 print()
 
 
-# === STRATEGY DEFINITION ======================================================
+# === STRATEGY DEFINITIONS =====================================================
+
 @simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
-def strategy(rsi_tables, *args, **kwargs):
+def rsi_growing_trend_strategy(rsi_tables, *args, **kwargs):
     day = kwargs['day']
     traded_stocks = kwargs['traded_stocks']
     stocks_to_buy = []
@@ -53,6 +57,12 @@ def strategy(rsi_tables, *args, **kwargs):
     
     return stocks_to_buy, stocks_to_sell
 
+# ==============================================================================
 
-result = strategy(rsi_tables)
-print('\n', result)
+
+# call startegy
+result = rsi_growing_trend_strategy(rsi_tables)
+
+print('\n', result.tail(1))
+plt.plot(result['Date'], result['Wallet state'])
+plt.show()
