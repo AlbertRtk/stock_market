@@ -1,0 +1,4 @@
+# TODO
+
+def macd():
+    pass

@@ -12,12 +12,12 @@ sns.set()
 
 
 # === CONFIG ===================================================================
-START_DATE = '2014-01-01'
-END_DATE = '2020-10-31'
+START_DATE = '2011-01-01'
+END_DATE = '2020-11-20'
 TRAIDING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
 MY_WALLET.money = 10000
-MAX_POSITIONS = 3
+MAX_POSITIONS = 5
 TAKE_PROFIT = 0.15
 STOP_LOSS = 0.03
 ACTIVE_TRAIDING = False
@@ -34,36 +34,17 @@ for tck in tqdm(TRADED_TICKERS):
     rsi_tables[tck] = rsi(stocks_data[tck].ohlc)
     rsi_tables[tck]['Buy'] = rsi_cross_signals(rsi_tables[tck], 30 , 'onrise')
     rsi_tables[tck]['Sell'] = rsi_cross_signals(rsi_tables[tck], 70, 'onrise')
+wig = Stock('WIG')
 print()
 
 
 # === STRATEGY DEFINITIONS =====================================================
 
 @simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
-def rsi_growing_trend_strategy(rsi_tables, *args, **kwargs):
+def my_strategy(wig, *args, **kwargs):
     day = kwargs['day']
     traded_stocks = kwargs['traded_stocks']
-    stocks_to_buy = []
-    stocks_to_sell = []
-    
-    for tck in rsi_tables:
-    
-        if rsi_tables[tck]['Buy'].get(day, None):
-            ohlc_before = traded_stocks[tck].ohlc[:day].tail(180).reset_index()
-            trend, *_ = stats.linregress(ohlc_before.index, ohlc_before['Close'])
-            if trend > 0.2:
-                stocks_to_buy.append(tck)
-    
-        if rsi_tables[tck]['Sell'].get(day, None):
-            stocks_to_sell.append(tck)
-    
-    return stocks_to_buy, stocks_to_sell
-
-
-@simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
-def high_volume_strategy(*args, **kwargs):
-    day = kwargs['day']
-    traded_stocks = kwargs['traded_stocks']
+    selected_stock = dict()
     stocks_to_buy = []
     stocks_to_sell = []
     
@@ -72,22 +53,25 @@ def high_volume_strategy(*args, **kwargs):
         if tck_ohlc['Volume'].get(day, None):
             mean_volume = mean_volume_on_date(tck_ohlc, day)
             day_volume = tck_ohlc.loc[day, 'Volume']
-            change = tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']
+            price_change = tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']
 
-            price_increased = change > 0
-            volume_increased = (day_volume/mean_volume) > 4
+            price_decreased =  price_change < 0
+            volume_increased = (day_volume/mean_volume) > 3.3
+            wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > 0
 
-            if price_increased and volume_increased:
-                stocks_to_buy.append(tck)
-    
+            if price_decreased and volume_increased and wig_increased:
+                selected_stock[tck] = day_volume/mean_volume
+
+    for tck, _ in sorted(selected_stock.items(), key=lambda item: item[1], reverse=False):
+        stocks_to_buy.append(tck)
+                
     return stocks_to_buy, stocks_to_sell
 
 # ==============================================================================
 
 
-# call startegy
-result = high_volume_strategy()
-
+# call startegy   
+result = my_strategy(wig)
 print('\n', result.tail(1))
 plt.plot(result['Date'], result['Wallet state'])
 plt.show()
