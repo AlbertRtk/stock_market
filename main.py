@@ -68,11 +68,16 @@ def high_volume_strategy(*args, **kwargs):
     stocks_to_sell = []
     
     for tck in traded_stocks:
-        if traded_stocks[tck].ohlc['Volume'].get(day, None):
-            mean_volume = mean_volume_on_date(traded_stocks[tck].ohlc, day)
-            day_volume = traded_stocks[tck].ohlc.loc[day, 'Volume']
-            
-            if (day_volume/mean_volume) > 4:
+        tck_ohlc = traded_stocks[tck].ohlc
+        if tck_ohlc['Volume'].get(day, None):
+            mean_volume = mean_volume_on_date(tck_ohlc, day)
+            day_volume = tck_ohlc.loc[day, 'Volume']
+            change = tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']
+
+            price_increased = change > 0
+            volume_increased = (day_volume/mean_volume) > 4
+
+            if price_increased and volume_increased:
                 stocks_to_buy.append(tck)
     
     return stocks_to_buy, stocks_to_sell
