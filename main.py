@@ -12,12 +12,12 @@ import seaborn as sns
 sns.set()
 
 
-# === CONFIG ===================================================================
-START_DATE = '2011-01-01'
+# === SIMULATOR CONFIG =========================================================
+START_DATE = '2014-01-01'
 END_DATE = '2020-11-20'
 TRAIDING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
-MY_WALLET.money = 10000
+MY_WALLET.money = 12000
 MAX_POSITIONS = 5
 TAKE_PROFIT = 0.9
 STOP_LOSS = 0.025
@@ -36,7 +36,12 @@ for tck in tqdm(TRADED_TICKERS):
 print()
 
 
-# === STRATEGY DEFINITIONS =====================================================
+# === STRATEGY DEFINITION ======================================================
+
+VOLUME_INCREASE_FACTOR = 3.3
+MAX_PRICE_CHANGE = 0
+MIN_WIG_CHANGE = 0
+
 
 @simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, MOVING_STOP_LOSS, ACTIVE_TRAIDING)
 def my_strategy(wig, *args, **kwargs):
@@ -46,7 +51,7 @@ def my_strategy(wig, *args, **kwargs):
     stocks_to_buy = []
     stocks_to_sell = []
     
-    wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > 0
+    wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE
 
     if wig_increased:
 
@@ -58,8 +63,8 @@ def my_strategy(wig, *args, **kwargs):
                 day_volume = tck_ohlc.loc[day, 'Volume']
                 price_change = tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']
 
-                price_decreased = price_change < 0
-                volume_increased = (day_volume/mean_volume) > 3.3
+                price_decreased = price_change < MAX_PRICE_CHANGE
+                volume_increased = (day_volume/mean_volume) > VOLUME_INCREASE_FACTOR
                 
                 if price_decreased and volume_increased:
                     selected_stock[tck] = day_volume/mean_volume
