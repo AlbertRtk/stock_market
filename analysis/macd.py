@@ -3,6 +3,13 @@ import pandas as pd
 
 def macd(prices: pd.DataFrame, mid_const: int=12, long_const: int=26, signal_const: int=9):
     """
+    Returns Pandas Dataframe with MACD, Signal, and Histogram.
+
+    :param prices:
+    :param mid_const:
+    :param long_const:
+    :param signal_const:
+    :returns:
     """
     price = prices['Close']
     output = pd.DataFrame(columns=['MACD', 'Signal', 'Histogram'])

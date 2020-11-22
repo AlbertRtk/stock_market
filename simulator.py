@@ -22,7 +22,7 @@ def __info_str(day, action, ticker, volume, price):
     return f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
 
 
-def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, auto_traiding=False):
+def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, moving_stop_loss=0, auto_traiding=False):
     """
     This function returns decorator for a stock market strategy.
 
@@ -32,8 +32,10 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
     :param max_positions: maximum number of different stocks in the wallet
     :param take_profit: if the price of a stock increases by this fraction, it will be sold;
         if equal 0 - take profit is deactivated (default)
-    :param stop_loss: if the price of a stock decreases by this fraction, it will be sold;
-        if equal 0 - stop loss is deactivated (default)
+    :param stop_loss: if the price of a stock decreases by this fraction (comparing to the 
+        purchase price), it will be sold; if equal 0 - stop loss is deactivated (default)
+    :param moving_stop_loss: if the price of a stock in a one day decreases by this fraction, 
+        it will be sold; if equal 0 - stop loss is deactivated (default)
     :param auto_traiding: boolean, if True selling immediately when stop loss / take profit 
         is reached is simulated
     :return: decorator for a stock market strategy that returns change of wallet value 
@@ -101,10 +103,14 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             print_red(__info_str(day_str, 'SL', tck, volume, price))
                             
                 for tck in wallet.list_stocks():                        
-                    # update the price to the closing price
-                    price = traded_stocks[tck].ohlc['Close'].get(day, None)
+                    # update the price to the closing price and calculate relative price change
+                    ohlc = traded_stocks[tck].ohlc
+                    price = ohlc['Close'].get(day, None)
                     if price:
                         wallet.update_price(tck, price)
+                        relativ_price_change = (ohlc.loc[day, 'Close'] - ohlc.loc[day, 'Open']) / ohlc.loc[day, 'Open']
+                    else:
+                        relativ_price_change = 0
 
                     # if auto traiding is not active, then take profit / stop loss the next day
                     if not auto_traiding:
@@ -113,8 +119,12 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                         if take_profit and wallet.change(tck) > take_profit:
                             stocks_to_sell.append(tck)
 
-                        # stop loss the next day
+                        # stop loss the next day - price below purchase price
                         if stop_loss and wallet.change(tck) < -stop_loss:
+                            stocks_to_sell.append(tck)
+
+                        # (moving) stop loss the next day - dreastic price drop
+                        if moving_stop_loss and relativ_price_change < -moving_stop_loss:
                             stocks_to_sell.append(tck)
 
                 # save history of the wallet
