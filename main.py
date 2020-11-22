@@ -13,7 +13,7 @@ sns.set()
 
 
 # === SIMULATOR CONFIG =========================================================
-START_DATE = '2014-01-01'
+START_DATE = '2019-01-01'
 END_DATE = '2020-11-20'
 TRAIDING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
