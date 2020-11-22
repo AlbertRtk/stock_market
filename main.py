@@ -23,8 +23,8 @@ TAKE_PROFIT = 0.9
 STOP_LOSS = 0.025
 MOVING_STOP_LOSS = 0.055
 ACTIVE_TRAIDING = False
-TRADED_TICKERS = mwig40 #wig20_2019
-# TRADED_TICKERS.update(mwig40)
+TRADED_TICKERS = wig20_2019
+TRADED_TICKERS.update(mwig40)
 # ==============================================================================
 
 
