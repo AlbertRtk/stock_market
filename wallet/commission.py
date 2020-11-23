@@ -2,6 +2,11 @@
 
 class Commission:
     def __init__(self, rate: float, minimum: float):
+        if minimum < 0:
+            raise ValueError('minimum has to be non-negative value')
+        if rate <= 0:
+            raise ValueError('rate has to be positive value')
+
         self.rate = rate
         self.minimum = minimum
 
