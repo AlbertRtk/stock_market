@@ -3,7 +3,7 @@ import pandas as pd
 from extra_print import print_green, print_red
 
 
-def __calculate_investment_value(wallet, max_fraction):
+def calculate_investment_value(wallet, max_fraction):
     output = 0
     min_value = wallet.minimal_recommended_investment()
     if wallet.money > min_value:
@@ -13,12 +13,12 @@ def __calculate_investment_value(wallet, max_fraction):
     return output
 
 
-def __determine_print_color_from_prices(price, purchase_price):
+def _determine_print_color_from_prices(price, purchase_price):
     print_color = print_green if price > purchase_price else print_red
     return print_color
 
 
-def __info_str(day, action, ticker, volume, price):
+def _info_str(day, action, ticker, volume, price):
     return f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
 
 
@@ -58,12 +58,12 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                     if not wallet.get_volume_of_stocks(tck):
                         price = traded_stocks[tck].ohlc['Open'].get(day, None)
                         if price:
-                            total = __calculate_investment_value(wallet, max_positions)
+                            total = calculate_investment_value(wallet, max_positions)
                             total = total - wallet(total)  # needs some money to pay commission
                             volume = math.floor(total/price)
                             if volume > 0:
                                 wallet.buy(tck, volume, price)
-                                print(__info_str(day_str, 'B', tck, volume, price))
+                                print(_info_str(day_str, 'B', tck, volume, price))
 
                 # Sell selected day before. List to set, we dont care here about the order.
                 # Set will remove duplcates.
@@ -71,9 +71,9 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                     if wallet.get_volume_of_stocks(tck):
                         price = traded_stocks[tck].ohlc['Open'].get(day, None)
                         if price: 
-                            print_color = __determine_print_color_from_prices(price, wallet.get_purchase_price_of_stocks(tck))
+                            print_color = _determine_print_color_from_prices(price, wallet.get_purchase_price_of_stocks(tck))
                             volume = wallet.sell_all(tck, price)
-                            print_color(__info_str(day_str, 'S', tck, volume, price))
+                            print_color(_info_str(day_str, 'S', tck, volume, price))
 
                 # call decorated function - strategy function
                 stocks_to_buy, stocks_to_sell = func(day=day, traded_stocks=traded_stocks, *args, **kwargs)
@@ -90,7 +90,7 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             price = wallet.get_purchase_price_of_stocks(tck) * (1+take_profit)  # selling it immediately
                             price = round(price, 2)
                             volume = wallet.sell_all(tck, price)
-                            print_green(__info_str(day_str, 'TP', tck, volume, price))
+                            print_green(_info_str(day_str, 'TP', tck, volume, price))
                             continue
 
                         price_min = traded_stocks[tck].ohlc['Low'].get(day, None)
@@ -100,7 +100,7 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             price = wallet.get_purchase_price_of_stocks(tck) * (1-stop_loss)  # selling it immediately
                             price = round(price, 2)
                             volume = wallet.sell_all(tck, price)
-                            print_red(__info_str(day_str, 'SL', tck, volume, price))
+                            print_red(_info_str(day_str, 'SL', tck, volume, price))
                             
                 for tck in wallet.list_stocks():                        
                     # update the price to the closing price and calculate relative price change
