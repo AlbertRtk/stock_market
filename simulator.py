@@ -22,7 +22,7 @@ def _info_str(day, action, ticker, volume, price):
     return f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
 
 
-def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, moving_stop_loss=0, auto_traiding=False):
+def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, auto_traiding=False):
     """
     This function returns decorator for a stock market strategy.
 
@@ -64,6 +64,9 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             if volume > 0:
                                 wallet.buy(tck, volume, price)
                                 print(_info_str(day_str, 'B', tck, volume, price))
+                                # make sure to not sell it the same day
+                                if tck in stocks_to_sell:
+                                    stocks_to_sell.remove(tck)
 
                 # Sell selected day before. List to set, we dont care here about the order.
                 # Set will remove duplcates.
@@ -108,9 +111,6 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                     price = ohlc['Close'].get(day, None)
                     if price:
                         wallet.update_price(tck, price)
-                        relativ_price_change = (ohlc.loc[day, 'Close'] - ohlc.loc[day, 'Open']) / ohlc.loc[day, 'Open']
-                    else:
-                        relativ_price_change = 0
 
                     # if auto traiding is not active, then take profit / stop loss the next day
                     if not auto_traiding:
@@ -121,10 +121,6 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
 
                         # stop loss the next day - price below purchase price
                         if stop_loss and wallet.change(tck) < -stop_loss:
-                            stocks_to_sell.append(tck)
-
-                        # (moving) stop loss the next day - dreastic price drop
-                        if moving_stop_loss and relativ_price_change < -moving_stop_loss:
                             stocks_to_sell.append(tck)
 
                 # save history of the wallet
