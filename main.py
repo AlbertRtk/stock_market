@@ -5,6 +5,7 @@ from analysis.macd import macd
 from stocks.stock_index import wig20_2019, mwig40
 from wallet.wallet import Wallet
 from simulator import simulator
+from daily_analysis import my_strategy
 from scipy import stats
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -38,64 +39,15 @@ print()
 
 # === STRATEGY DEFINITION ======================================================
 
-MIN_VOLUME_INCREASE_FACTOR_TO_BUY = 3.3
-MAX_PRICE_CHANGE_TO_BUY = 0
-MIN_WIG_CHANGE_TO_BUY = 0
-MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
-
-
 @simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
-def my_strategy(wig, *args, **kwargs):
-    day = kwargs['day']
-    traded_stocks = kwargs['traded_stocks']
-    selected_stock = dict()
-    stocks_to_buy = []
-    stocks_to_sell = []
-
-    # --- look for buy signals ---
-
-    wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
-
-    if wig_increased:
-
-        for tck in traded_stocks:
-            tck_ohlc = traded_stocks[tck].ohlc
-
-            if tck_ohlc['Volume'].get(day, None):
-                mean_volume = mean_volume_on_date(tck_ohlc, day)
-                day_volume = tck_ohlc.loc[day, 'Volume']
-                price_change = tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']
-
-                price_decreased = price_change < MAX_PRICE_CHANGE_TO_BUY
-                volume_increased = (day_volume/mean_volume) > MIN_VOLUME_INCREASE_FACTOR_TO_BUY
-                
-                if price_decreased and volume_increased:
-                    selected_stock[tck] = day_volume/mean_volume
-
-    for tck, _ in sorted(selected_stock.items(), key=lambda item: item[1], reverse=False):
-        stocks_to_buy.append(tck)
-
-    # --- look for sell signals ---
-
-    for tck in traded_stocks:
-        tck_ohlc = traded_stocks[tck].ohlc
-
-        if tck_ohlc['Close'].get(day, None):
-            relativ_price_change = (tck_ohlc.loc[day, 'Close'] - tck_ohlc.loc[day, 'Open']) / tck_ohlc.loc[day, 'Open']
-        else:
-            relativ_price_change = 0
-
-        if relativ_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
-            if tck not in stocks_to_buy:
-                stocks_to_sell.append(tck)
-
-    return stocks_to_buy, stocks_to_sell
+def strategy(wig, *args, **kwargs):
+    return my_strategy(wig, *args, **kwargs)
 
 # ==============================================================================
 
 
 # call startegy   
-result = my_strategy(wig)
+result = strategy(wig)
 print('\n', result.tail(1))
 plt.plot(result['Date'], result['Wallet state'])
 plt.show()
