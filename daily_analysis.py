@@ -14,7 +14,7 @@ MIN_WIG_CHANGE_TO_BUY = 0
 MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
 
 def my_strategy(wig, *args, **kwargs):
-    day = kwargs['day']
+    day = str(kwargs['day'])
     traded_stocks = kwargs['traded_stocks']
     selected_stock = dict()
     stocks_to_buy = []
@@ -22,8 +22,8 @@ def my_strategy(wig, *args, **kwargs):
 
     # --- look for buy signals ---
 
-    wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
-
+    #wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
+    wig_increased = True
     if wig_increased:
 
         for tck in traded_stocks:
