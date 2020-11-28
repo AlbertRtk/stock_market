@@ -1,12 +1,8 @@
 from stocks.stock import Stock
-from analysis.rsi import rsi,rsi_cross_signals
-from analysis.volume import mean_volume_on_date
-from analysis.macd import macd
 from stocks.stock_index import wig20_2019, mwig40
 from wallet.wallet import Wallet
 from simulator import simulator
 from daily_analysis import my_strategy
-from scipy import stats
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns

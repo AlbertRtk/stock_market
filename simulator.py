@@ -1,10 +1,8 @@
 import math
 import pandas as pd
 from wallet.wallet import calculate_investment_value
-from extra_print import print_green, print_red
-
-
-
+from extra_print import print_green, print_red, \
+    determine_print_color_from_prices, info_str
 
 
 def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, auto_traiding=False):
@@ -48,7 +46,7 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             volume = math.floor(total/price)
                             if volume > 0:
                                 wallet.buy(tck, volume, price)
-                                print(_info_str(day_str, 'B', tck, volume, price))
+                                print(info_str(day_str, 'B', tck, volume, price))
                                 # make sure to not sell it the same day
                                 if tck in stocks_to_sell:
                                     stocks_to_sell.remove(tck)
@@ -59,9 +57,9 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                     if wallet.get_volume_of_stocks(tck):
                         price = traded_stocks[tck].ohlc['Open'].get(day, None)
                         if price: 
-                            print_color = _determine_print_color_from_prices(price, wallet.get_purchase_price_of_stocks(tck))
+                            print_color = determine_print_color_from_prices(price, wallet.get_purchase_price_of_stocks(tck))
                             volume = wallet.sell_all(tck, price)
-                            print_color(_info_str(day_str, 'S', tck, volume, price))
+                            print_color(info_str(day_str, 'S', tck, volume, price))
 
                 # call decorated function - strategy function
                 stocks_to_buy, stocks_to_sell = func(day=day, traded_stocks=traded_stocks, *args, **kwargs)
@@ -78,7 +76,7 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             price = wallet.get_purchase_price_of_stocks(tck) * (1+take_profit)  # selling it immediately
                             price = round(price, 2)
                             volume = wallet.sell_all(tck, price)
-                            print_green(_info_str(day_str, 'TP', tck, volume, price))
+                            print_green(info_str(day_str, 'TP', tck, volume, price))
                             continue
 
                         price_min = traded_stocks[tck].ohlc['Low'].get(day, None)
@@ -88,7 +86,7 @@ def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0,
                             price = wallet.get_purchase_price_of_stocks(tck) * (1-stop_loss)  # selling it immediately
                             price = round(price, 2)
                             volume = wallet.sell_all(tck, price)
-                            print_red(_info_str(day_str, 'SL', tck, volume, price))
+                            print_red(info_str(day_str, 'SL', tck, volume, price))
                             
                 for tck in wallet.list_stocks():                        
                     # update the price to the closing price and calculate relative price change
