@@ -1,25 +1,10 @@
 import math
 import pandas as pd
+from wallet.wallet import calculate_investment_value
 from extra_print import print_green, print_red
 
 
-def calculate_investment_value(wallet, max_fraction):
-    output = 0
-    min_value = wallet.minimal_recommended_investment()
-    if wallet.money > min_value:
-        max_value = wallet.total_value / max_fraction
-        output = max(max_value, min_value)
-        output = min(output, wallet.money)
-    return output
 
-
-def _determine_print_color_from_prices(price, purchase_price):
-    print_color = print_green if price > purchase_price else print_red
-    return print_color
-
-
-def _info_str(day, action, ticker, volume, price):
-    return f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
 
 
 def simulator(time_range, traded_stocks, wallet, max_positions=5, take_profit=0, stop_loss=0, auto_traiding=False):

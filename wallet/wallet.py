@@ -158,3 +158,14 @@ class Wallet(Commission):
         price = self.stocks.loc[idx, 'Price']
         output = (price - purchase_price) / purchase_price
         return output
+
+
+def calculate_investment_value(wallet, max_positions):
+    output = 0
+    min_value = wallet.minimal_recommended_investment()
+    if wallet.money > min_value:
+        max_value = wallet.total_value / max_positions
+        output = max(max_value, min_value)
+        output = min(output, wallet.money)
+    return output
+    
