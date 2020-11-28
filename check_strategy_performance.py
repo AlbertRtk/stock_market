@@ -16,7 +16,7 @@ sns.set()
 # === SIMULATOR CONFIG =========================================================
 START_DATE = '2014-01-01'
 END_DATE = '2020-10-31'
-TRAIDING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
+TRADING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
 MY_WALLET.money = 12000
@@ -24,7 +24,7 @@ MY_WALLET.money = 12000
 MAX_POSITIONS = 5
 TAKE_PROFIT = 0.9
 STOP_LOSS = 0.025
-ACTIVE_TRAIDING = False
+ACTIVE_TRADING = False
 
 TRADED_TICKERS = wig20_2019
 TRADED_TICKERS.update(mwig40)
@@ -41,7 +41,7 @@ print()
 
 # === STRATEGY DEFINITION ======================================================
 
-@simulator(TRAIDING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRAIDING)
+@simulator(TRADING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRADING)
 def strategy(wig, *args, **kwargs):
     return my_strategy(wig, *args, **kwargs)
 
