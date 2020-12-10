@@ -1,8 +1,5 @@
-[See on GitHub!](https://github.com/AlbertRtk/stock_market_insights) 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-[Other projets](https://albertrtk.github.io/projects.html)
-
----
+Stock Market Insights
+=====================
 
 The project focuses on the analysis of the stock market and the automation of the decision process for financial investing.
 

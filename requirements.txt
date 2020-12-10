@@ -4,3 +4,4 @@ mplfinance
 requests
 seaborn
 notebook
+pytest

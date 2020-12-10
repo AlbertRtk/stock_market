@@ -36,7 +36,7 @@ def rsi_cross_signals(rsi_values: pd.DataFrame, cross_line: float, direction: st
     :rsi_values: pandas.DataFrame with RSI column
     :cross_line: signal threshold line, when signal line crosses this line signal is set
     :direction: direction the signal line should cross threshold line 
-    ('onrise' - signal increasing [default], 'onfall' - signal decreasing)
+        ('onrise' - signal increasing [default], 'onfall' - signal decreasing)
     :return: pandas.Series with with True values for days when signal appears
     """
     if not (0 < cross_line < 100):
