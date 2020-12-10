@@ -1,7 +1,8 @@
-from stocks.stock import Stock
-from stocks.stock_index import wig20_2019, mwig40
-from wallet.wallet import Wallet
-from simulator import simulator
+from marketools import Stock
+from marketools.wallet import Wallet
+from marketools import simulator
+
+from stock_index import wig20_2019, mwig40
 from daily_analysis import my_strategy
 from tqdm import tqdm
 import matplotlib.pyplot as plt

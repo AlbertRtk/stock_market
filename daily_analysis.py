@@ -1,7 +1,7 @@
-from stocks.stock import Stock
-from analysis.volume import mean_volume_on_date
-from analysis.price import relative_price_change
-from stocks.stock_index import wig20_2019, mwig40
+from marketools import Stock
+from marketools.analysis import mean_volume_on_date
+from marketools.analysis import relative_price_change
+from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 from datetime import date
 
