@@ -5,3 +5,4 @@ requests
 seaborn
 notebook
 pytest
+marketools
