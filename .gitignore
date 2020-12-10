@@ -133,3 +133,4 @@ dmypy.json
 
 *.ods
 *.ods#
+.stock_market_data
