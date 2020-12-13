@@ -16,7 +16,7 @@ END_DATE = '2020-10-31'
 TRADING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
-MY_WALLET.money = 12000
+MY_WALLET.money = 10000
 
 MAX_POSITIONS = 5
 TAKE_PROFIT = 0.9

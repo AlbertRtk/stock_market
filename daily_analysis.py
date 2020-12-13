@@ -22,8 +22,8 @@ def my_strategy(wig, *args, **kwargs):
 
     # --- look for buy signals ---
 
-    wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
-    #wig_increased = True
+    wig_increased = (wig.last - wig.open) > MIN_WIG_CHANGE_TO_BUY
+
     if wig_increased:
 
         for tck in traded_stocks:
