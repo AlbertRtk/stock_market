@@ -13,6 +13,7 @@ MAX_RELATIVE_PRICE_CHANGE_TO_BUY = 0
 MIN_WIG_CHANGE_TO_BUY = 0
 MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
 
+
 def my_strategy(wig, *args, **kwargs):
     day = str(kwargs['day'])
     traded_stocks = kwargs['traded_stocks']
@@ -51,7 +52,7 @@ def my_strategy(wig, *args, **kwargs):
 
         if tck_ohlc['Close'].get(day, None):
             price_change = relative_price_change(tck_ohlc.loc[day, 'Close'], 
-                                                tck_ohlc.loc[day, 'Open'])
+                                                 tck_ohlc.loc[day, 'Open'])
         else:
             price_change = 0
 
