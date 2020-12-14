@@ -1,6 +1,6 @@
 from marketools import Stock
 from marketools.analysis import mean_volume_on_date
-from marketools.analysis import relative_price_change
+from marketools.analysis import relative_price_change, price_change
 from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 from datetime import date
@@ -23,7 +23,10 @@ def my_strategy(wig, *args, **kwargs):
 
     # --- look for buy signals ---
 
-    wig_increased = (wig.last - wig.open) > MIN_WIG_CHANGE_TO_BUY
+    if str(date.today()) == day:
+        wig_increased = (wig.last - wig.open) > MIN_WIG_CHANGE_TO_BUY
+    else:
+        wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
 
     if wig_increased:
 
@@ -33,10 +36,10 @@ def my_strategy(wig, *args, **kwargs):
             if tck_ohlc['Volume'].get(day, None):
                 mean_volume = mean_volume_on_date(tck_ohlc, day)
                 day_volume = tck_ohlc.loc[day, 'Volume']
-                price_change = relative_price_change(tck_ohlc.loc[day, 'Close'],
-                                                     tck_ohlc.loc[day, 'Open'])
+                day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'],
+                                                         tck_ohlc.loc[day, 'Open'])
 
-                price_decreased = price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
+                price_decreased = day_price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
                 volume_increased = (day_volume/mean_volume) > MIN_VOLUME_INCREASE_FACTOR_TO_BUY
                 
                 if price_decreased and volume_increased:
@@ -51,12 +54,12 @@ def my_strategy(wig, *args, **kwargs):
         tck_ohlc = traded_stocks[tck].ohlc
 
         if tck_ohlc['Close'].get(day, None):
-            price_change = relative_price_change(tck_ohlc.loc[day, 'Close'], 
-                                                 tck_ohlc.loc[day, 'Open'])
+            day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'],
+                                                     tck_ohlc.loc[day, 'Open'])
         else:
-            price_change = 0
+            day_price_change = 0
 
-        if price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
+        if day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
             if tck not in stocks_to_buy:
                 stocks_to_sell.append(tck)
 
