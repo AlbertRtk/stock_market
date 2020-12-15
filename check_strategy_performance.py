@@ -1,6 +1,6 @@
 from marketools import Stock
 from marketools.wallet import Wallet
-from marketools import simulator
+from marketools import Simulator
 
 from stock_index import wig20_2019, mwig40
 from daily_analysis import my_strategy
@@ -35,18 +35,10 @@ for tck in tqdm(TRADED_TICKERS):
     stocks_data[tck] = Stock(tck)
 print()
 
+my_simulator = Simulator(TRADING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS,
+                         TAKE_PROFIT, STOP_LOSS, ACTIVE_TRADING)
 
-# === STRATEGY DEFINITION ======================================================
-
-@simulator(TRADING_DAYS, stocks_data, MY_WALLET, MAX_POSITIONS, TAKE_PROFIT, STOP_LOSS, ACTIVE_TRADING)
-def strategy(wig, *args, **kwargs):
-    return my_strategy(wig, *args, **kwargs)
-
-# ==============================================================================
-
-
-# call startegy   
-result = strategy(wig)
+result = my_simulator.run(my_strategy, wig=wig)
 print('\n', result.tail(1))
 plt.plot(result['Date'], result['Wallet state'])
 plt.show()
