@@ -27,7 +27,7 @@ def my_strategy(wig, *args, **kwargs):
         wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
 
     for tck in traded_stocks:
-        tck_ohlc = traded_stocks[tck].ohlc
+        tck_ohlc = traded_stocks[tck].ohlc[:day]
         data_exists = tck_ohlc['Close'].get(day, None)
 
         if data_exists:
@@ -37,16 +37,18 @@ def my_strategy(wig, *args, **kwargs):
             day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'], tck_ohlc.loc[day, 'Open'])
 
             # look for buy signals
-            if wig_increased and data_exists:
-                price_change_to_buy_ok = day_price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
+            if wig_increased:
+                price_change_buy = day_price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
                 day_volume_increased = (day_volume/mean_volume_long) > MIN_VOLUME_INCREASE_FACTOR_TO_BUY
 
-                if price_change_to_buy_ok and day_volume_increased:
+                if price_change_buy and day_volume_increased:
                     # buy!
                     selected_stocks[tck] = day_volume/mean_volume_long
 
             # look for sell signals
-            if day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
+            price_change_sell = day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP
+
+            if price_change_sell:
                 if tck not in selected_stocks:
                     # sell!
                     stocks_to_sell.append(tck)
