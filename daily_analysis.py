@@ -1,6 +1,6 @@
 from marketools import Stock
 from marketools.analysis import mean_volume_on_date
-from marketools.analysis import relative_price_change, price_change
+from marketools.analysis import price_change
 from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 from datetime import date
@@ -34,7 +34,8 @@ def my_strategy(wig, *args, **kwargs):
             # calculate indicators
             mean_volume_long = mean_volume_on_date(tck_ohlc, day, window=90)
             day_volume = tck_ohlc.loc[day, 'Volume']
-            day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'], tck_ohlc.loc[day, 'Open'])
+            day_price_change = price_change(tck_ohlc.tail(1), shift=0, relative=True)[day]
+            # mid_price_change = price_change(tck_ohlc.tail(6), shift=5, relative=True)[day]
 
             # look for buy signals
             if wig_increased:
