@@ -17,51 +17,43 @@ MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
 def my_strategy(wig, *args, **kwargs):
     day = str(kwargs['day'])
     traded_stocks = kwargs['traded_stocks']
-    selected_stock = dict()
+    selected_stocks = dict()
     stocks_to_buy = []
     stocks_to_sell = []
-
-    # --- look for buy signals ---
 
     if str(date.today()) == day:
         wig_increased = (wig.last - wig.open) > MIN_WIG_CHANGE_TO_BUY
     else:
         wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
 
-    if wig_increased:
-
-        for tck in traded_stocks:
-            tck_ohlc = traded_stocks[tck].ohlc
-
-            if tck_ohlc['Volume'].get(day, None):
-                mean_volume = mean_volume_on_date(tck_ohlc, day)
-                day_volume = tck_ohlc.loc[day, 'Volume']
-                day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'],
-                                                         tck_ohlc.loc[day, 'Open'])
-
-                price_decreased = day_price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
-                volume_increased = (day_volume/mean_volume) > MIN_VOLUME_INCREASE_FACTOR_TO_BUY
-                
-                if price_decreased and volume_increased:
-                    selected_stock[tck] = day_volume/mean_volume
-
-    for tck, _ in sorted(selected_stock.items(), key=lambda item: item[1], reverse=False):
-        stocks_to_buy.append(tck)
-
-    # --- look for sell signals ---
-
     for tck in traded_stocks:
         tck_ohlc = traded_stocks[tck].ohlc
+        data_exists = tck_ohlc['Close'].get(day, None)
 
-        if tck_ohlc['Close'].get(day, None):
-            day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'],
-                                                     tck_ohlc.loc[day, 'Open'])
-        else:
-            day_price_change = 0
+        if data_exists:
+            # calculate indicators
+            mean_volume_long = mean_volume_on_date(tck_ohlc, day, window=90)
+            day_volume = tck_ohlc.loc[day, 'Volume']
+            day_price_change = relative_price_change(tck_ohlc.loc[day, 'Close'], tck_ohlc.loc[day, 'Open'])
 
-        if day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
-            if tck not in stocks_to_buy:
-                stocks_to_sell.append(tck)
+            # look for buy signals
+            if wig_increased and data_exists:
+                price_change_to_buy_ok = day_price_change < MAX_RELATIVE_PRICE_CHANGE_TO_BUY
+                day_volume_increased = (day_volume/mean_volume_long) > MIN_VOLUME_INCREASE_FACTOR_TO_BUY
+
+                if price_change_to_buy_ok and day_volume_increased:
+                    # buy!
+                    selected_stocks[tck] = day_volume/mean_volume_long
+
+            # look for sell signals
+            if day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP:
+                if tck not in selected_stocks:
+                    # sell!
+                    stocks_to_sell.append(tck)
+
+    # sort stocks to buy - lower volume increase first
+    for tck, _ in sorted(selected_stocks.items(), key=lambda item: item[1], reverse=False):
+        stocks_to_buy.append(tck)
 
     return stocks_to_buy, stocks_to_sell
 
