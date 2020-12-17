@@ -1,6 +1,5 @@
 from marketools import Stock
-from marketools.analysis import mean_volume_on_date
-from marketools.analysis import price_change
+from marketools.analysis import mean_volume_on_date, price_change
 from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 from datetime import date
@@ -17,7 +16,7 @@ MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
 def my_strategy(wig, *args, **kwargs):
     day = str(kwargs['day'])
     traded_stocks = kwargs['traded_stocks']
-    selected_stocks = dict()
+    selected_stocks_to_buy = dict()
     stocks_to_buy = []
     stocks_to_sell = []
 
@@ -44,18 +43,18 @@ def my_strategy(wig, *args, **kwargs):
 
                 if price_change_buy and day_volume_increased:
                     # buy!
-                    selected_stocks[tck] = day_volume/mean_volume_long
+                    selected_stocks_to_buy[tck] = day_volume/mean_volume_long
 
             # look for sell signals
             price_change_sell = day_price_change < -MAX_RELATIVE_PRICE_DROP_TO_KEEP
 
             if price_change_sell:
-                if tck not in selected_stocks:
+                if tck not in selected_stocks_to_buy:
                     # sell!
                     stocks_to_sell.append(tck)
 
     # sort stocks to buy - lower volume increase first
-    for tck, _ in sorted(selected_stocks.items(), key=lambda item: item[1], reverse=False):
+    for tck, _ in sorted(selected_stocks_to_buy.items(), key=lambda item: item[1], reverse=False):
         stocks_to_buy.append(tck)
 
     return stocks_to_buy, stocks_to_sell
