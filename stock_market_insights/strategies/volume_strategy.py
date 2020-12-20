@@ -10,7 +10,7 @@ Buy the next day if:
       increase ratio
 
 Sel the next day if:
-* Stock is not on the list of stocks to buy and stock price decreases 5.5% in
+* Stock is not on the list of stocks to buy and stock price decreases 5% in
   one day, i.e., (close - open) / open < -0.055
 * Stock price drops below 97.5% of purchase price (Stop Loss 2.5%)
 * Stock price increases above 190% of purchase price (Take Profit 90%)
@@ -26,12 +26,12 @@ import math
 MIN_VOLUME_INCREASE_FACTOR_TO_BUY = 3.3
 MAX_RELATIVE_PRICE_CHANGE_TO_BUY = 0
 MIN_WIG_CHANGE_TO_BUY = 0
-MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.055
+MAX_RELATIVE_PRICE_DROP_TO_KEEP = 0.05
 TAKE_PROFIT = 0.9
-STOP_LOSS = 0.02
+STOP_LOSS = 0.025
 MAX_POSITIONS = 5
-MIN_INVESTMENT = 2500
-MAX_INVESTMENT = 10000
+MIN_INVESTMENT = 1000
+MAX_INVESTMENT = 1000000
 
 
 def volume_strategy(day, wallet, traded_stocks, wig, *args, **kwargs):

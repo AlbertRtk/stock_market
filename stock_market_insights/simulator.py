@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from marketools import Wallet
+from datetime import date
 
 
 def print_red(skk):
@@ -63,6 +64,8 @@ class Simulator:
         self.auto_trading = auto_trading
         self.wallet_history = pd.DataFrame(columns=['Date', 'Wallet state'])
         self.show_plot = show_plot
+        self.__plot_ref_lines = dict()
+        self.__simulated_year_now = None
 
     def reset(self) -> None:
         """
@@ -96,6 +99,11 @@ class Simulator:
         stocks_to_sell = dict()
 
         for day in self.time_range:
+
+            # save reference wallet values for plot hlines
+            if self.show_plot and (self.__simulated_year_now != day.year):
+                self.__simulated_year_now = day.year
+                self.__plot_ref_lines[day] = self.wallet.total_value
 
             # Buy selected day before. Loop over list, order can be important
             # here. Strategy can sort relevant stocks - high priority first.
@@ -247,6 +255,11 @@ class Simulator:
         Shows animated plot of wallet total value over time during simulation.
         """
         plt.clf()
+        for day, ref in self.__plot_ref_lines.items():
+            plt.hlines(ref,
+                       day,
+                       self.time_range[-1],
+                       colors='r')
         plt.plot(self.wallet_history['Date'], self.wallet_history['Wallet state'])
         plt.xlim([self.time_range[0], self.time_range[-1]])
         plt.title(f'Wallet total value: {round(self.wallet.total_value, 2)}')
