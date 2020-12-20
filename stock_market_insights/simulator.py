@@ -18,9 +18,9 @@ def determine_print_color_from_prices(change):
 
 
 def info_str(day, action, ticker, volume, price, change=None):
-    output = f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
+    output = f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2):<{7}}'
     if change:
-        output += f'   \t {round(100*change, 1):>{5}}%'
+        output += f' \t {round(100*change, 1):>{5}}%'
     return output
 
 
