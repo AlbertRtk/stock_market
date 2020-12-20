@@ -1,8 +1,10 @@
 from simulator import Simulator
 from marketools import Stock, Wallet
-from stock_index import wig20_2019, mwig40
-from daily_analysis import my_strategy
+from stock_market_insights.stock_index import wig20_2019, mwig40
 from tqdm import tqdm
+
+
+from stock_market_insights.strategies import volume_strategy as my_strategy
 
 
 # === SIMULATOR CONFIG =========================================================
