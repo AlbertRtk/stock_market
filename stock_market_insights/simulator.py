@@ -12,13 +12,16 @@ def print_green(skk):
     print("\033[92m{}\033[00m" .format(skk))
 
 
-def determine_print_color_from_prices(price, purchase_price):
-    print_color = print_green if price > purchase_price else print_red
+def determine_print_color_from_prices(change):
+    print_color = print_green if change > 0 else print_red
     return print_color
 
 
-def info_str(day, action, ticker, volume, price):
-    return f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
+def info_str(day, action, ticker, volume, price, change=None):
+    output = f'{day}: {action:<{2}} {ticker} \t {volume:>{4}} \t for {round(price, 2)}'
+    if change:
+        output += f'   \t {round(100*change, 1):>{5}}%'
+    return output
 
 
 class Simulator:
@@ -226,9 +229,13 @@ class Simulator:
 
                 if price and (volume > 0):
                     print_color = determine_print_color_from_prices(
-                        price,
-                        self.wallet.get_purchase_price_of_stocks(tck))
-                    print_color(info_str(day.strftime('%Y-%m-%d'), 'S', tck, volume, price))
+                        self.wallet.change(tck))
+                    print_color(info_str(day.strftime('%Y-%m-%d'),
+                                         'S',
+                                         tck,
+                                         volume,
+                                         price,
+                                         self.wallet.change(tck)))
                     self.wallet.sell(tck, volume, price)
 
     def __update_wallet_stock_prices_to_close(self, day):
