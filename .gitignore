@@ -135,3 +135,4 @@ dmypy.json
 *.ods#
 .stock_market_data
 .idea
+.marketools_data

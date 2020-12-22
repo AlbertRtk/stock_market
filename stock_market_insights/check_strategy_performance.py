@@ -1,5 +1,5 @@
 from simulator import Simulator
-from marketools import Stock, Wallet
+from marketools import Stock, Wallet, store_data
 from stock_market_insights.stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 
@@ -19,6 +19,7 @@ TRADED_TICKERS.update(mwig40)
 
 
 if __name__ == '__main__':
+    store_data()
     print('Preparing data...')
     wig = Stock('WIG')
     stocks_data = dict()

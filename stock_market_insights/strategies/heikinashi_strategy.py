@@ -3,8 +3,6 @@
 
 """
 
-from stock_market_insights.analysis.heikinashi import heikinashi
-from marketools.analysis import ema, rsi, rsi_cross_signals
 import math
 from datetime import timedelta
 
@@ -15,7 +13,7 @@ MAX_POSITIONS = 5
 MIN_INVESTMENT = 1000
 MAX_INVESTMENT = 1000000
 
-LONG_BULL_CANDLE_CLOSE_OPEN_RATIO = 1.04
+LONG_BULL_CANDLE_CLOSE_OPEN_RATIO = 1.05
 LONG_BEAR_CANDLE_OPEN_CLOSE_RATIO = 1.03
 BEAR_CANDLE_OPEN_CLOSE_RATIO = 1.02
 MAX_CHANGE_SHORT_CANDLE = 0.02
@@ -30,8 +28,8 @@ def ha_init(traded_stocks):
     global HA_HEIKINASHI
     if not HA_HEIKINASHI:
         for tck in traded_stocks:
-            print(f'Calculating Heikin-Ashi for {tck}.')
-            HA_HEIKINASHI[tck] = heikinashi(traded_stocks[tck].ohlc)
+            print(f'Heikin-Ashi for {tck}')
+            HA_HEIKINASHI[tck] = traded_stocks[tck].heikinashi()
 
 
 def is_long_bullish_candle(ohlc, day):
