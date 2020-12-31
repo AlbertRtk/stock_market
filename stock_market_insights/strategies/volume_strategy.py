@@ -39,7 +39,7 @@ def volume_strategy(day, wallet, traded_stocks, wig, *args, **kwargs):
     stocks_to_buy = dict()
     stocks_to_sell = dict()
 
-    if str(date.today()) == day:
+    if date.today() == day:
         wig_increased = (wig.last - wig.open) > MIN_WIG_CHANGE_TO_BUY
     else:
         wig_increased = (wig.ohlc.loc[day, 'Close'] - wig.ohlc.loc[day, 'Open']) > MIN_WIG_CHANGE_TO_BUY
