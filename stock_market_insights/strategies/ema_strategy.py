@@ -2,13 +2,13 @@
 
 """
 
-from marketools.wallet import calculate_investment_value
-from marketools.analysis import mean_volume_on_date
-from marketools.analysis import price_change
+from marketools.analysis import ema
 from datetime import date
 import math
 
-
+EMA_LONG_PERIOD = 50
+EMA_MID_PERIOD = 15
+EMA_SHORT_PERIOD = 5
 TAKE_PROFIT = 0.9
 STOP_LOSS = 0.025
 MAX_POSITIONS = 5
@@ -21,12 +21,20 @@ def volume_strategy(day, wallet, traded_stocks, *args, **kwargs):
     stocks_to_sell = dict()
 
     for tck in traded_stocks:
-        pass
-        # calculate EMAs
+        tck_ohlc = traded_stocks[tck].ohlc[:day]
+        close_price = tck_ohlc['Close'].get(day, None)
 
-        # buy signals
+        if close_price:
+            # calculate EMAs
+            ema_long = ema(ohlc=tck_ohlc, window=EMA_LONG_PERIOD)
+            ema_mid = ema(ohlc=tck_ohlc, window=EMA_MID_PERIOD)
+            ema_short = ema(ohlc=tck_ohlc, window=EMA_SHORT_PERIOD)
 
-        # sell signals
+            # buy signals
+            #   - short crosses long, or
+            #   - short crosses mid and mid greater than long
+
+            # sell signals - short crosses mid
 
     for tck in wallet.list_stocks():
         # take profit the next day
