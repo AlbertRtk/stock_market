@@ -136,3 +136,5 @@ dmypy.json
 .stock_market_data
 .idea
 .marketools_data
+strategy_optimization.txt
+sandbox.py
