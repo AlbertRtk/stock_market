@@ -5,14 +5,13 @@
 from marketools.analysis import ema
 import math
 
-EMA_LONG_PERIOD = 100
-EMA_MID_PERIOD = 15
+EMA_LONG_PERIOD = 180
+EMA_MID_PERIOD = 14
 EMA_SHORT_PERIOD = 5
-MIN_LONG_EMA_TREND_LENGTH = 2
-TAKE_PROFIT = 0.5
-STOP_LOSS = 0.025
-MAX_POSITIONS = 5
-MIN_INVESTMENT = 3000
+TAKE_PROFIT = 0.7
+STOP_LOSS = 0.02
+MAX_POSITIONS = 3
+MIN_INVESTMENT = 1000
 MAX_INVESTMENT = 1000000
 
 
@@ -29,11 +28,6 @@ def set_ema_mid_period(value):
 def set_ema_short_period(value):
     global EMA_SHORT_PERIOD
     EMA_SHORT_PERIOD = value
-
-
-def set_min_long_ema_trend_length(value):
-    global MIN_LONG_EMA_TREND_LENGTH
-    MIN_LONG_EMA_TREND_LENGTH = value
 
 
 def set_take_profit(value):
@@ -76,8 +70,8 @@ def ema_strategy(day, wallet, traded_stocks, *args, **kwargs):
             ema_short = ema(ohlc=tck_ohlc, window=EMA_SHORT_PERIOD)
 
             # buy signals
-            buy = (ema_short[-1] > ema_mid[-1]) and (ema_short[-2] < ema_mid[-2])
-            buy = buy and all([ema_long[-i] > ema_long[-i-1] for i in range(1, MIN_LONG_EMA_TREND_LENGTH)])
+            buy = (ema_short[-1] > ema_mid[-1] > ema_long[-1]) and (ema_mid[-2] > ema_short[-2] > ema_long[-2])
+            # buy = buy and all([ema_long[-i] > ema_long[-i-1] for i in range(1, MIN_LONG_EMA_TREND_LENGTH)])
 
             if buy:
                 if not wallet.get_volume_of_stocks(tck):
@@ -90,7 +84,7 @@ def ema_strategy(day, wallet, traded_stocks, *args, **kwargs):
                     stocks_to_buy[tck] = (volume_to_buy, None)
 
             # sell signals
-            sell = ema_long[-1] < ema_long[-2]
+            sell = (ema_short[-1] < ema_long[-1]) and (ema_long[-2] < ema_short[-2])
 
             if sell and (tck in wallet.list_stocks()):
                 stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
