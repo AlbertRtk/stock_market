@@ -138,3 +138,5 @@ dmypy.json
 .marketools_data
 strategy_optimization.txt
 sandbox.py
+plots/
+log

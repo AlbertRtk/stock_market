@@ -1,12 +1,14 @@
-from marketools import Stock, Wallet
-from stock_market_insights.stock_index import wig20_2019, mwig40
-from stock_market_insights.strategies import volume_strategy
+from marketools import Stock, Wallet, StockQuotes, store_data
+from stock_index import wig20_2019, mwig40
+from strategies import volume_strategy, ema_strategy
 from tqdm import tqdm
 from datetime import date
 
 
 if __name__ == '__main__':
     MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
+    MY_WALLET.money = 8500
+
     TRADED_TICKERS = wig20_2019
     TRADED_TICKERS.update(mwig40)
     # temp update with Allegro
@@ -19,9 +21,10 @@ if __name__ == '__main__':
         stocks_data[tck] = Stock(tck)
     print()
 
-    buy, sell = volume_strategy(day=date.today(),
-                                wallet=MY_WALLET,
-                                traded_stocks=stocks_data,
-                                wig=wig_)
+    buy, sell = ema_strategy(
+        day=date.today(),
+        wallet=MY_WALLET,
+        traded_stocks=stocks_data,
+        wig=wig_)
     print('Buy:  ', buy)
     print('Sell: ', sell)
