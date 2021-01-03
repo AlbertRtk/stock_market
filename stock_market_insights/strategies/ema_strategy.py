@@ -5,55 +5,15 @@
 from marketools.analysis import ema
 import math
 
+
 EMA_LONG_PERIOD = 180
 EMA_MID_PERIOD = 14
 EMA_SHORT_PERIOD = 5
 TAKE_PROFIT = 1.1
 STOP_LOSS = 0.015
 MAX_POSITIONS = 3
-
 MIN_INVESTMENT = 1000
 MAX_INVESTMENT = 1000000
-
-
-def set_ema_long_period(value):
-    global EMA_LONG_PERIOD
-    EMA_LONG_PERIOD = value
-
-
-def set_ema_mid_period(value):
-    global EMA_MID_PERIOD
-    EMA_MID_PERIOD = value
-
-
-def set_ema_short_period(value):
-    global EMA_SHORT_PERIOD
-    EMA_SHORT_PERIOD = value
-
-
-def set_take_profit(value):
-    global TAKE_PROFIT
-    TAKE_PROFIT = value
-
-
-def set_stop_loss(value):
-    global STOP_LOSS
-    STOP_LOSS = value
-
-
-def set_max_positions(value):
-    global MAX_POSITIONS
-    MAX_POSITIONS = value
-
-
-def set_min_investment(value):
-    global MIN_INVESTMENT
-    MIN_INVESTMENT = value
-
-
-def set_max_investment(value):
-    global MAX_INVESTMENT
-    MAX_INVESTMENT = value
 
 
 def ema_strategy(day, wallet, traded_stocks, *args, **kwargs):
@@ -99,6 +59,46 @@ def ema_strategy(day, wallet, traded_stocks, *args, **kwargs):
             stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
 
     return stocks_to_buy, stocks_to_sell
+
+
+def set_ema_long_period(value):
+    global EMA_LONG_PERIOD
+    EMA_LONG_PERIOD = value
+
+
+def set_ema_mid_period(value):
+    global EMA_MID_PERIOD
+    EMA_MID_PERIOD = value
+
+
+def set_ema_short_period(value):
+    global EMA_SHORT_PERIOD
+    EMA_SHORT_PERIOD = value
+
+
+def set_take_profit(value):
+    global TAKE_PROFIT
+    TAKE_PROFIT = value
+
+
+def set_stop_loss(value):
+    global STOP_LOSS
+    STOP_LOSS = value
+
+
+def set_max_positions(value):
+    global MAX_POSITIONS
+    MAX_POSITIONS = value
+
+
+def set_min_investment(value):
+    global MIN_INVESTMENT
+    MIN_INVESTMENT = value
+
+
+def set_max_investment(value):
+    global MAX_INVESTMENT
+    MAX_INVESTMENT = value
 
 
 if __name__ == '__main__':

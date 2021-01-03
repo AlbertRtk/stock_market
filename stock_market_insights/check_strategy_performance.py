@@ -14,7 +14,7 @@ store_data()
 # === SIMULATOR CONFIG =========================================================
 START_DATE = '2015-01-01'  # '2015-01-01'
 END_DATE = '2020-12-31'  # '2019-12-31'
-TRADING_DAYS = Stock('CCC').ohlc[START_DATE:END_DATE].index
+TRADING_DAYS = Stock('WIG').ohlc[START_DATE:END_DATE].index
 MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)
 MY_WALLET.money = 10000
 TRADED_TICKERS = wig20_2019
