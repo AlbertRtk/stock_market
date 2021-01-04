@@ -32,17 +32,13 @@ if __name__ == '__main__':
 
     my_simulator = Simulator(TRADING_DAYS, stocks_data, MY_WALLET, show_plot=False)
 
-    for i_per in range(30, 51, 10):
-        set_ema_long_trend_period(i_per)
+    for i in range(8000, 12001, 500):
+        set_max_investment(i)
 
-        for i_slope_ in range(1, 11, 2):
-            i_slope = i_slope_ / 100
-            set_min_ema_long_relative_slope(i_slope)
+        my_simulator.reset()
+        result = my_simulator.run(my_strategy).tail(1)['Wallet state']
+        result = float(result)
+        summary = f'{i}\t{result}\n'
 
-            my_simulator.reset()
-            result = my_simulator.run(my_strategy).tail(1)['Wallet state']
-            result = float(result)
-            summary = f'{i_per}\t{i_slope}\t{result}\n'
-
-            with open('strategy_optimization.txt', 'a') as f:
-                f.write(summary)
+        with open('strategy_optimization.txt', 'a') as f:
+            f.write(summary)

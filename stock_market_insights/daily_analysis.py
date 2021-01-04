@@ -1,9 +1,10 @@
-from marketools import Stock, Wallet, StockQuotes, store_data
+from marketools import Stock, Wallet, store_data
 from stock_index import wig20_2019, mwig40
-from strategies import volume_strategy, ema_strategy
+from strategies import ema_strategy
 from tqdm import tqdm
 from datetime import date
 
+store_data()
 
 if __name__ == '__main__':
     MY_WALLET = Wallet(commission_rate=0.0038, min_commission=3.0)

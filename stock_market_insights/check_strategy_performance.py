@@ -4,7 +4,7 @@ from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 
 
-from strategies import ema_strategy as my_strategy
+from strategies import volume_strategy as my_strategy
 
 
 StockQuotes.check_for_update = False
@@ -31,5 +31,5 @@ if __name__ == '__main__':
 
     my_simulator = Simulator(TRADING_DAYS, stocks_data, MY_WALLET, show_plot=True)
 
-    result = my_simulator.run(my_strategy)
+    result = my_simulator.run(my_strategy, wig=Stock('WIG'))
     print('\n', result.tail(1))
