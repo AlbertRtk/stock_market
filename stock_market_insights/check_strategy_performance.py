@@ -1,3 +1,5 @@
+import sys; sys.path.insert(0, 'marketools')
+
 from simulator import Simulator
 from marketools import Stock, Wallet, store_data, StockQuotes
 from stock_index import wig20_2019, mwig40
