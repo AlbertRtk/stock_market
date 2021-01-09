@@ -1,5 +1,5 @@
 """
-Strategy based on EMAs crossing.
+
 """
 
 from marketools.analysis import ema

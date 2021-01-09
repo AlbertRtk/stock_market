@@ -1,14 +1,13 @@
-import sys; sys.path.insert(0, 'marketools')
 from simulator import Simulator
 from marketools import Stock, Wallet, store_data, StockQuotes
 from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 
 
-from strategies import ema_strategy as my_strategy
+from strategies import EmaVolStrategy as MyStrategy
 
 
-StockQuotes.check_for_update = True
+StockQuotes.check_for_update = False
 store_data()
 
 
@@ -31,6 +30,8 @@ if __name__ == '__main__':
     print()
 
     my_simulator = Simulator(TRADING_DAYS, stocks_data, MY_WALLET, show_plot=True)
+
+    my_strategy = MyStrategy()
 
     result = my_simulator.run(my_strategy)
     print('\n', result.tail(1))

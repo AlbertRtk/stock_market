@@ -1,4 +1,3 @@
-import sys; sys.path.insert(0, 'marketools')
 from marketools import Stock, Wallet, store_data
 from stock_index import wig20_2019, mwig40
 from strategies import ema_strategy
