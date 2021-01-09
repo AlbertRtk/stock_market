@@ -1,0 +1,3 @@
+[submodule "stock_market_insights/marketools"]
+	path = stock_market_insights/marketools
+	url = https://github.com/AlbertRtk/marketools.git
