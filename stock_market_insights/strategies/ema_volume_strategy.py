@@ -1,9 +1,10 @@
 """
-
+TODO: work in progress
 """
 
-from marketools.analysis import ema
+from marketools.analysis import ema, mean_volume_on_date, price_change
 import math
+from datetime import date
 
 
 class EmaVolStrategy:
@@ -11,6 +12,9 @@ class EmaVolStrategy:
         self.ema_long_period = 180
         self.ema_mid_period = 14
         self.ema_short_period = 5
+        self.vol_mean_long_window = 30
+        self.vol_mean_short_window = 3
+        self.min_vol_increase_to_buy = 1
         self.take_profit = 1.1
         self.stop_loss = 0.015
         self.max_positions = 3
@@ -19,6 +23,7 @@ class EmaVolStrategy:
 
     def __call__(self, day, wallet, traded_stocks, *args, **kwargs):
         stocks_to_buy = dict()
+        buy_sort_keys = dict()
         stocks_to_sell = dict()
 
         for tck in traded_stocks:
@@ -31,8 +36,15 @@ class EmaVolStrategy:
                 ema_mid = ema(ohlc=tck_ohlc, window=self.ema_mid_period)
                 ema_short = ema(ohlc=tck_ohlc, window=self.ema_short_period)
 
+                vol_mean_long = mean_volume_on_date(tck_ohlc, day, window=self.vol_mean_long_window)
+                vol_mean_short = mean_volume_on_date(tck_ohlc, day, window=self.vol_mean_short_window)
+                vol_mean_short_long_ratio = vol_mean_short / vol_mean_long
+
                 # buy signals
-                buy = (ema_short[-1] > ema_mid[-1] > ema_long[-1]) and (ema_mid[-2] > ema_short[-2] > ema_long[-2])
+                vol_increased = vol_mean_short_long_ratio >= self.min_vol_increase_to_buy
+                ema_crossed = (ema_short[-1] > ema_mid[-1] > ema_long[-1]) \
+                              and (ema_mid[-2] > ema_short[-2] > ema_long[-2])
+                buy = vol_increased and ema_crossed
 
                 if buy:
                     if not wallet.get_volume_of_stocks(tck):
@@ -42,6 +54,7 @@ class EmaVolStrategy:
                         invest = min(invest, self.max_investment)
                         invest = invest / (1 + wallet.rate)  # needs some money to pay commission
                         volume_to_buy = math.floor(invest / close_price)
+                        buy_sort_keys[tck] = vol_mean_short_long_ratio
                         stocks_to_buy[tck] = (volume_to_buy, None)
 
                 # sell signals
@@ -57,6 +70,12 @@ class EmaVolStrategy:
             # stop loss the next day - price below purchase price
             if wallet.change(tck) < -self.stop_loss:
                 stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
+
+        # sort stocks to buy - lower volume increase first
+        sorted_items = sorted(stocks_to_buy.items(),
+                              key=lambda item: buy_sort_keys[item[0]],
+                              reverse=False)
+        stocks_to_buy = dict(sorted_items)
 
         return stocks_to_buy, stocks_to_sell
 
