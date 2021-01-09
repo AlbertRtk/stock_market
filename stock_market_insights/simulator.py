@@ -1,7 +1,7 @@
+import sys; sys.path.insert(0, 'marketools')
 import pandas as pd
 import matplotlib.pyplot as plt
 from marketools import Wallet
-from datetime import date
 
 
 def print_red(skk):

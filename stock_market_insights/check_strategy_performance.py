@@ -1,3 +1,4 @@
+import sys; sys.path.insert(0, 'marketools')
 from simulator import Simulator
 from marketools import Stock, Wallet, store_data, StockQuotes
 from stock_index import wig20_2019, mwig40
@@ -7,7 +8,7 @@ from tqdm import tqdm
 from strategies import ema_strategy as my_strategy
 
 
-StockQuotes.check_for_update = False
+StockQuotes.check_for_update = True
 store_data()
 
 
