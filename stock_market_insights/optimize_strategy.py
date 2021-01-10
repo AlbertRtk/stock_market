@@ -3,9 +3,7 @@ from marketools import Stock, Wallet, store_data, StockQuotes
 from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 
-
-from strategies import ema_strategy as my_strategy
-from strategies.ema_strategy import *
+from strategies import EmaVolStrategy
 
 
 StockQuotes.check_for_update = False
@@ -24,21 +22,27 @@ TRADED_TICKERS.update(mwig40)
 
 if __name__ == '__main__':
     print('Preparing data...')
-    wig = Stock('WIG')
+    # wig = Stock('WIG')
     stocks_data = dict()
     for tck in tqdm(TRADED_TICKERS):
         stocks_data[tck] = Stock(tck)
     print()
 
     my_simulator = Simulator(TRADING_DAYS, stocks_data, MY_WALLET, show_plot=False)
+    my_strategy = EmaVolStrategy()
 
-    for i in range(8000, 12001, 500):
-        set_max_investment(i)
+    for l_win in range(70, 91, 5):
 
-        my_simulator.reset()
-        result = my_simulator.run(my_strategy).tail(1)['Wallet state']
-        result = float(result)
-        summary = f'{i}\t{result}\n'
+        for _vol_inc in range(13, 21):
+            vol_inc = _vol_inc / 10
 
-        with open('strategy_optimization.txt', 'a') as f:
-            f.write(summary)
+            my_strategy.vol_mean_long_window = l_win
+            my_strategy.min_vol_increase_to_buy = vol_inc
+
+            my_simulator.reset()
+            result = my_simulator.run(my_strategy).tail(1)['Wallet state']
+            result = float(result)
+            summary = f'{l_win}\t{vol_inc}\t{result}\n'
+
+            with open('strategy_optimization.txt', 'a') as f:
+                f.write(summary)

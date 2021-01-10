@@ -2,9 +2,8 @@
 TODO: work in progress
 """
 
-from marketools.analysis import ema, mean_volume_on_date, price_change
+from marketools.analysis import ema, mean_volume_on_date
 import math
-from datetime import date
 
 
 class EmaVolStrategy:
@@ -12,9 +11,10 @@ class EmaVolStrategy:
         self.ema_long_period = 180
         self.ema_mid_period = 14
         self.ema_short_period = 5
-        self.vol_mean_long_window = 30
-        self.vol_mean_short_window = 3
-        self.min_vol_increase_to_buy = 1
+        self.vol_mean_long_window = 70
+        self.vol_mean_short_window = 1
+        self.min_vol_increase_to_buy = 1.3
+        # self.min_vol_increase_to_sell = 6
         self.take_profit = 1.1
         self.stop_loss = 0.015
         self.max_positions = 3
@@ -59,6 +59,9 @@ class EmaVolStrategy:
 
                 # sell signals
                 sell = (ema_short[-1] < ema_long[-1]) and (ema_long[-2] < ema_short[-2])
+                # vol_sell = (vol_mean_short_long_ratio >= self.min_vol_increase_to_sell) \
+                #            and all((ema_short.tail(5)-ema_mid.tail(5)) > 0)
+                # sell = sell or vol_sell
 
                 if sell and (tck in wallet.list_stocks()):
                     stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
@@ -71,7 +74,7 @@ class EmaVolStrategy:
             if wallet.change(tck) < -self.stop_loss:
                 stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
 
-        # sort stocks to buy - lower volume increase first
+        # sort stocks to buy
         sorted_items = sorted(stocks_to_buy.items(),
                               key=lambda item: buy_sort_keys[item[0]],
                               reverse=False)
