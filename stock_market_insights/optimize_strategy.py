@@ -15,6 +15,37 @@ TRADED_TICKERS.update(mwig40)
 # ==============================================================================
 
 
+def test_for_years(strategy, traded_stock, start_year, end_year, step_year):
+    gains = []
+
+    for y in range(start_year, end_year, step_year):
+        start_date = f'{y}-01-01'
+        end_date = f'{y}-12-31'
+        trading_days = Stock('WIG').ohlc[start_date:end_date].index
+        wallet = Wallet(commission_rate=0.0038, min_commission=3.0)
+        wallet.money = 10000
+
+        my_simulator = Simulator(trading_days, traded_stock, wallet)
+
+        result = my_simulator.run(strategy)
+        result = result.tail(1)['Wallet state']
+        result = float(result)
+
+        gains.append(result-10000)
+
+    save_test_results(gains)
+
+
+def save_test_results(results):
+    summary = ''
+    for g in results:
+        summary += f'{g}\t'
+    summary += f'{sum(results)}\n'
+
+    with open('strategy_optimization.txt', 'a') as f:
+        f.write(summary)
+
+
 if __name__ == '__main__':
     print('Preparing data...')
     stocks_data = dict()
@@ -22,29 +53,13 @@ if __name__ == '__main__':
         stocks_data[tck] = Stock(tck)
     print()
 
-    gain_in_year = []
+    my_strategy = EmaVolStrategy()
 
-    for y in range(2015, 2020, 1):
-        start_date = f'{y}-01-01'
-        end_date = f'{y}-12-31'
-        trading_days = Stock('WIG').ohlc[start_date:end_date].index
-        wallet = Wallet(commission_rate=0.0038, min_commission=3.0)
-        wallet.money = 10000
+    for tp_ in range(7, 12, 1):
+        tp = tp_ / 10
+        my_strategy.take_profit = tp
 
-        my_simulator = Simulator(trading_days, stocks_data, wallet)
-        my_strategy = EmaVolStrategy()
+        with open('strategy_optimization.txt', 'a') as f:
+            f.write(f'{tp}\t')
 
-        my_simulator.reset()
-        result = my_simulator.run(my_strategy)
-        result = result.tail(1)['Wallet state']
-        result = float(result)
-
-        gain_in_year.append(result-10000)
-
-    summary = ''
-    for g in gain_in_year:
-        summary += f'{g}\t'
-    summary += f'{sum(gain_in_year)}'
-
-    with open('strategy_optimization.txt', 'a') as f:
-        f.write(summary)
+        test_for_years(my_strategy, stocks_data, 2015, 2020, 1)
