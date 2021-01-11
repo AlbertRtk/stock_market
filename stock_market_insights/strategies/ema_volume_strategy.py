@@ -16,7 +16,7 @@ class EmaVolStrategy:
         self.min_vol_increase_to_buy = 1.6
         # self.min_vol_increase_to_sell = 6
         self.take_profit = 1.1
-        self.stop_loss = 0.015
+        self.stop_loss = 0.022
         self.max_positions = 3
         self.min_investment = 1000
         self.max_investment = 1000000

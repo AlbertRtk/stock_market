@@ -42,7 +42,7 @@ def save_test_results(results):
         summary += f'{g}\t'
     summary += f'{sum(results)}\n'
 
-    with open('strategy_optimization.txt', 'a') as f:
+    with open('EMAVolStrategy_optimization_SL.txt', 'a') as f:
         f.write(summary)
 
 
@@ -55,11 +55,11 @@ if __name__ == '__main__':
 
     my_strategy = EmaVolStrategy()
 
-    for tp_ in range(1, 7, 1):
-        tp = tp_ / 10
-        my_strategy.take_profit = tp
+    for sl_ in range(26, 36, 1):
+        sl = sl_ / 1000
+        my_strategy.stop_loss = sl
 
-        with open('strategy_optimization.txt', 'a') as f:
-            f.write(f'{tp}\t')
+        with open('EMAVolStrategy_optimization_SL.txt', 'a') as f:
+            f.write(f'{sl}\t')
 
         test_for_years(my_strategy, stocks_data, 2015, 2020, 1)
