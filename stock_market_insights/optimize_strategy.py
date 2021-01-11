@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     my_strategy = EmaVolStrategy()
 
-    for tp_ in range(7, 12, 1):
+    for tp_ in range(1, 7, 1):
         tp = tp_ / 10
         my_strategy.take_profit = tp
 

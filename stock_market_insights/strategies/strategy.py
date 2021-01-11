@@ -5,9 +5,6 @@ class Strategy:
         self.take_profit = 0.0
         self.stop_loss = 0.0
 
-    def test(self, year_start, year_end, year_step):
-        pass
-
     def tpsl(self, wallet):
         stocks_to_sell = dict()
 
