@@ -11,9 +11,9 @@ class EmaVolStrategy:
         self.ema_long_period = 180
         self.ema_mid_period = 14
         self.ema_short_period = 5
-        self.vol_mean_long_window = 70
+        self.vol_mean_long_window = 75
         self.vol_mean_short_window = 1
-        self.min_vol_increase_to_buy = 1.3
+        self.min_vol_increase_to_buy = 1.6
         # self.min_vol_increase_to_sell = 6
         self.take_profit = 1.1
         self.stop_loss = 0.015
