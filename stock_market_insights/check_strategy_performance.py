@@ -4,7 +4,7 @@ from stock_index import wig20_2019, mwig40
 from tqdm import tqdm
 
 
-from strategies import EmaVolStrategy as MyStrategy
+from strategies import EmaStrategy as MyStrategy
 
 
 StockQuotes.check_for_update = False

@@ -3,11 +3,13 @@ Strategy based on EMAs crossing.
 """
 
 from marketools.analysis import ema
+from .strategy import Strategy
 import math
 
 
-class EmaStrategy:
+class EmaStrategy(Strategy):
     def __init__(self):
+        super().__init__()
         self.ema_long_period = 180
         self.ema_mid_period = 14
         self.ema_short_period = 5
@@ -19,7 +21,6 @@ class EmaStrategy:
 
     def __call__(self, day, wallet, traded_stocks, *args, **kwargs):
         stocks_to_buy = dict()
-        # buy_sort_keys = dict()
         stocks_to_sell = dict()
 
         for tck in traded_stocks:
@@ -43,7 +44,6 @@ class EmaStrategy:
                         invest = min(invest, self.max_investment)
                         invest = invest / (1 + wallet.rate)  # needs some money to pay commission
                         volume_to_buy = math.floor(invest / close_price)
-                        # buy_sort_keys[tck] = (ema_mid[-1]-ema_long[-1])/ema_long[-1]
                         stocks_to_buy[tck] = (volume_to_buy, None)
 
                 # sell signals
@@ -52,19 +52,8 @@ class EmaStrategy:
                 if sell and (tck in wallet.list_stocks()):
                     stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
 
-        for tck in wallet.list_stocks():
-            # take profit the next day
-            if wallet.change(tck) > self.take_profit:
-                stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
-            # stop loss the next day - price below purchase price
-            if wallet.change(tck) < -self.stop_loss:
-                stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
-
-        # sort stocks to buy - lower volume increase first
-        # sorted_items = sorted(stocks_to_buy.items(),
-        #                       key=lambda item: buy_sort_keys[item[0]],
-        #                       reverse=True)
-        # stocks_to_buy = dict(sorted_items)
+        stocks_to_sell.update(self.tp_stocks(wallet))
+        stocks_to_sell.update(self.sl_stocks(wallet))
 
         return stocks_to_buy, stocks_to_sell
 

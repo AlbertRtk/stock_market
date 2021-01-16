@@ -1,6 +1,6 @@
 from marketools import Stock, Wallet, store_data
 from stock_index import wig20_2019, mwig40
-from strategies import ema_strategy
+from strategies import EmaStrategy
 from tqdm import tqdm
 from datetime import date
 
@@ -22,7 +22,8 @@ if __name__ == '__main__':
         stocks_data[tck] = Stock(tck)
     print()
 
-    buy, sell = ema_strategy(
+    my_strategy = EmaStrategy()
+    buy, sell = my_strategy(
         day=date.today(),
         wallet=MY_WALLET,
         traded_stocks=stocks_data,
