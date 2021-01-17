@@ -52,8 +52,8 @@ class EmaStrategy(Strategy):
                 if sell and (tck in wallet.list_stocks()):
                     stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
 
-        stocks_to_sell.update(self.tp_stocks(wallet))
-        stocks_to_sell.update(self.sl_stocks(wallet))
+        stocks_to_sell.update(self.get_stocks_take_profit(wallet))
+        stocks_to_sell.update(self.get_stocks_stop_loss(wallet))
 
         return stocks_to_buy, stocks_to_sell
 

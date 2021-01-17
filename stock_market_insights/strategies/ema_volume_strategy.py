@@ -3,11 +3,13 @@ TODO: work in progress
 """
 
 from marketools.analysis import ema, mean_volume_on_date
+from .strategy import Strategy
 import math
 
 
-class EmaVolStrategy:
+class EmaVolStrategy(Strategy):
     def __init__(self):
+        super().__init__()
         self.ema_long_period = 180
         self.ema_mid_period = 14
         self.ema_short_period = 5
@@ -66,13 +68,8 @@ class EmaVolStrategy:
                 if sell and (tck in wallet.list_stocks()):
                     stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
 
-        for tck in wallet.list_stocks():
-            # take profit the next day
-            if wallet.change(tck) > self.take_profit:
-                stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
-            # stop loss the next day - price below purchase price
-            if wallet.change(tck) < -self.stop_loss:
-                stocks_to_sell[tck] = (wallet.get_volume_of_stocks(tck), None)
+        stocks_to_sell.update(self.get_stocks_take_profit(wallet))
+        stocks_to_sell.update(self.get_stocks_stop_loss(wallet))
 
         # sort stocks to buy
         sorted_items = sorted(stocks_to_buy.items(),
