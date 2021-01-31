@@ -1,6 +1,6 @@
 from marketools import Stock, Wallet, store_data
 from stock_index import wig20_2019, mwig40
-from strategies import EmaStrategy
+from strategies import EmaVolStrategy
 from tqdm import tqdm
 from datetime import date
 
@@ -16,17 +16,15 @@ if __name__ == '__main__':
     TRADED_TICKERS['ALE'] = 'Allegro'
 
     print('Preparing data...')
-    wig_ = Stock('WIG')
     stocks_data = dict()
     for tck in tqdm(TRADED_TICKERS):
         stocks_data[tck] = Stock(tck)
     print()
 
-    my_strategy = EmaStrategy()
+    my_strategy = EmaVolStrategy()
     buy, sell = my_strategy(
         day=date.today(),
         wallet=MY_WALLET,
-        traded_stocks=stocks_data,
-        wig=wig_)
+        traded_stocks=stocks_data)
     print('Buy:  ', buy)
     print('Sell: ', sell)

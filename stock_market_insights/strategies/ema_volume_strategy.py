@@ -1,5 +1,5 @@
 """
-TODO: work in progress
+TODO: description
 """
 
 from marketools.analysis import ema, mean_volume_on_date
