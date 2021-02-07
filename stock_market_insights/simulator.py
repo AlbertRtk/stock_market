@@ -187,7 +187,7 @@ class Simulator:
                 value += self.wallet.commission(value)
                 if self.wallet.money > value:
                     print(info_str(day.strftime('%Y-%m-%d'), 'B', tck, volume, price))
-                    self.wallet.buy(tck, volume, price)
+                    self.wallet.buy(tck, volume, price, day)
 
     def __sell_selected_stocks(self, day, stocks_to_sell):
         """
