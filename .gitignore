@@ -1,3 +1,4 @@
+secret/
 *.txt
 .vscode
 test.py
