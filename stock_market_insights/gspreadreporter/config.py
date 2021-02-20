@@ -53,5 +53,5 @@ SCOPE = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/spreadsheets',
          'https://www.googleapis.com/auth/drive.file',
          'https://www.googleapis.com/auth/drive']
-GOOGLE_CREDS = r'secret/credentials.json'
+GOOGLE_CREDS = r'/home/albi/projects/stock_market_insights/stock_market_insights/gspreadreporter/secret/credentials.json'
 SPREADSHEET_ID = '1FwrZ30o_JZEKN7ANwwnuc7ZiUxxdjWQ6pfEbcamlaZ4'

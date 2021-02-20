@@ -1,6 +1,9 @@
+import sys
+sys.path.append("/home/albi/projects/stock_market_insights/stock_market_insights/marketools")
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from marketools import Stock, store_data, StockQuotes
+from marketools import Stock, store_data
 from report_sheet import update_report
 from wallet_sheet import update_wallet
 from config import *
