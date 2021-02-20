@@ -13,7 +13,7 @@ def fill_in_report_row(row, share):
     long_mean = share.mean_volume(90)
     short_mean = share.mean_volume(5)
     row[TICKERS_COL - 1].value = share.ticker
-    row[REPORT_PRICES_COL - 1].value = share.price
+    row[REPORT_PRICES_COL - 1].value = share.last_ohlc['Close']
     row[REPORT_PBV_COL - 1].value = share.pbv
     row[REPORT_EPS_COL - 1].value = share.eps
     row[REPORT_PE_COL - 1].value = share.pe
@@ -46,5 +46,5 @@ def update_report(report_wks, stocks: dict):
     """ Update worksheet """
     for i, tck in enumerate(stocks, FIRST_DATA_ROW):
         share = stocks[tck]
-        print(f'{1+i-FIRST_DATA_ROW}\t{tck}\t Data from: {share.date}')
+        # print(f'{1+i-FIRST_DATA_ROW}\t{tck}\t Data from: {share.date}')
         update_report_row(report_wks, i, share)

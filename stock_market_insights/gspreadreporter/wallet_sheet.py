@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def update_wallet_row(wallet_wks, row_idx, share):
-    wallet_wks.update_cell(row_idx, WALLET_PRICES_COL, share.price)
+    wallet_wks.update_cell(row_idx, WALLET_PRICES_COL, share.last_ohlc['Close'])
     wallet_wks.update_cell(row_idx, WALLET_PBV_COL, share.pbv)
     wallet_wks.update_cell(row_idx, WALLET_EPS_COL, share.eps)
     wallet_wks.update_cell(row_idx, WALLET_PE_COL, share.pe)
@@ -28,8 +28,8 @@ def update_wallet(wallet_wks):
     wallet_wks.update_acell(UPDATE_TIME_ACELL, time_now.strftime('%Y-%m-%d, %H:%M'))
     for i, tck in enumerate(wallet_tickers_list, FIRST_DATA_ROW):
         share = wallet_shares[tck]
-        price_date = share.date
-        message = f'{tck}:\t\t{share.price} PLN'
+        price_date = share.last_ohlc.name.strftime('%Y-%m-%d')
+        message = f'{tck}:\t\t{share.last_ohlc["Close"]} PLN'
         if price_date != str_today:
             message += f'\t\tWARNING! Today is {str_today}, last price from {price_date}.'
         print(message)
