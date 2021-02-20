@@ -1,4 +1,4 @@
-secret/
+credentials.json
 *.txt
 .vscode
 test.py

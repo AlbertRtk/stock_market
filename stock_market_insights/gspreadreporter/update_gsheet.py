@@ -1,0 +1,40 @@
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from marketools import Stock
+from report_sheet import update_report
+from wallet_sheet import update_wallet
+from config import *
+
+
+def update_stocks_spreadsheet(spreadsheet):
+    wallet = spreadsheet.worksheet(WS_WALLET)
+    report = spreadsheet.worksheet(WS_REPORT)
+    watched = spreadsheet.worksheet(WS_WATCHED)
+
+    """ UPDATE WALLET WORKSHEET """
+    update_wallet(wallet)
+
+    """ GET INCREASED VOLUME STOCKS """
+    stocks_to_analyse = {s: Stock(s) for s in MY_TICKERS}
+    print('\nSelecting stocks for report...')
+    selected_stocks = []  #select_increased_volume_stocks_by_factor(stocks_to_analyse)
+    print(f'{len(selected_stocks)} stocks selected')
+
+    """ UPDATE ANALYSIS REPORT """
+    print('Adding watched stocks...')
+    watched_stocks = watched.col_values(TICKERS_COL)[FIRST_DATA_ROW - 1::]
+    report_stocks = {s: Stock(s) for s in watched_stocks}
+    report_stocks.update(selected_stocks)
+    update_report(report, report_stocks)
+
+
+if __name__ == '__main__':
+    """ Get authorized connection """
+    creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_CREDS, SCOPE)
+    client = gspread.authorize(creds)
+
+    """ Open spreadsheet """
+    sh = client.open_by_key(SPREADSHEET_ID)
+
+    """ Update spreadsheet """
+    update_stocks_spreadsheet(sh)
