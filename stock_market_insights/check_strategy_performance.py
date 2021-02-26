@@ -7,7 +7,7 @@ from tqdm import tqdm
 from strategies import EmaVolStrategy as MyStrategy
 
 
-StockQuotes.check_for_update = True
+# StockQuotes.check_for_update = False  # True is default
 store_data()
 
 
