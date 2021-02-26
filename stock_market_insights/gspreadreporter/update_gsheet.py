@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/albi/projects/stock_market_insights/stock_market_insights/marketools")
+sys.path.append("../marketools")
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
