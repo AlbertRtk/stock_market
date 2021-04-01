@@ -7,5 +7,10 @@ from datetime import date
 
 store_data()
 
-""" WIP """
+""" 
+WIP 
+
+Saves daily report to ODS file.
+
+"""
 
