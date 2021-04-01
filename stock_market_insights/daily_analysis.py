@@ -1,3 +1,6 @@
+import sys
+sys.path.append("marketools")
+
 from marketools import Stock, Wallet, store_data
 from stock_index import wig20_2019, mwig40
 from strategies import EmaVolStrategy
